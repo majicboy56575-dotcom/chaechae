@@ -422,10 +422,10 @@ export default function UploadCard() {
                       }`}
                     >
                       <span className="block text-[11px] font-extrabold leading-tight">
-                        {t(`sheet_size_${size.id}_label` as any)}
+                        {t(`sheet_size_${size.id}_label` as keyof typeof import("../lib/i18n/translations").translations.th)}
                       </span>
                       <span className="block text-[9px] font-medium mt-0.5 opacity-70">
-                        {t(`sheet_size_${size.id}_note` as any)}
+                        {t(`sheet_size_${size.id}_note` as keyof typeof import("../lib/i18n/translations").translations.th)}
                       </span>
                     </button>
                   );

@@ -22,7 +22,6 @@ const LANGUAGE_STORAGE_KEY = "chae_chae_selected_lang";
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<SupportedLanguage>("th");
-  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     try {
@@ -41,8 +40,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       }
     } catch {
       // ignore
-    } finally {
-      setIsInitialized(true);
     }
   }, []);
 
