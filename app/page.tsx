@@ -8,10 +8,12 @@ import LanguageSelector from "./components/LanguageSelector";
 import { useTranslation } from "./lib/i18n/LanguageContext";
 import { CATEGORIES, STYLES } from "./lib/styles";
 import { getLocalCredits } from "./lib/pricing";
+import { useAuth } from "./lib/auth/AuthContext";
 
 export default function Home() {
   const { t } = useTranslation();
   const [currentCredits, setCurrentCredits] = useState(0);
+  const { user, loginWithGoogle, logout, loading } = useAuth();
 
   useEffect(() => {
     setCurrentCredits(getLocalCredits());
@@ -71,6 +73,54 @@ export default function Home() {
             >
               {t("nav_recharge")}
             </Link>
+            {loading ? (
+              <div className="w-8 h-8 rounded-full border border-indigo-100 bg-indigo-50 animate-pulse" />
+            ) : user ? (
+              <div className="flex items-center gap-2">
+                {user.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt={user.displayName || "User"}
+                    className="w-8 h-8 rounded-full border border-indigo-200 object-cover"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full border border-indigo-200 bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold font-outfit">
+                    {user.displayName ? user.displayName[0].toUpperCase() : user.email ? user.email[0].toUpperCase() : "U"}
+                  </div>
+                )}
+                <button
+                  onClick={logout}
+                  className="text-xs font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 px-3 py-2 rounded-xl transition-all"
+                >
+                  {t("nav_logout")}
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={loginWithGoogle}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 px-3.5 py-2 rounded-xl transition-all shadow-sm active:scale-[0.98]"
+              >
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
+                  <path
+                    fill="#EA4335"
+                    d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582L19.91 3C17.782 1.145 15.055 0 12 0 7.33 0 3.327 2.68 1.386 6.582L5.266 9.765z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M16.04 15.345c-1.127.755-2.545 1.2-4.04 1.2a7.07 7.07 0 0 1-6.734-4.855L1.38 14.873C3.32 18.79 7.33 21.5 12 21.5c3.155 0 6.018-1.073 8.082-2.909l-4.042-3.246z"
+                  />
+                  <path
+                    fill="#4285F4"
+                    d="M23.49 12.273c0-.773-.073-1.527-.2-2.273H12v4.51h6.464a5.527 5.527 0 0 1-2.4 3.636l4.043 3.246c2.363-2.173 3.73-5.382 3.73-9.119z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.266 11.735a7.07 7.07 0 0 1 0-1.97L1.38 6.582A11.956 11.956 0 0 0 0 12c0 1.927.455 3.745 1.266 5.373l3.99-3.136a7.077 7.077 0 0 1 0-2.502z"
+                  />
+                </svg>
+                <span>{t("nav_login")}</span>
+              </button>
+            )}
             <button
               onClick={scrollToUpload}
               className="bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl transition-all duration-200 shadow-md shadow-slate-950/5 active:scale-[0.98]"

@@ -25,6 +25,8 @@ export const translations = {
     nav_start: "시작하기",
     nav_recharge: "크레딧 충전",
     nav_credits: "보유 크레딧",
+    nav_login: "로그인",
+    nav_logout: "로그아웃",
 
     // Hero Section
     hero_badge: "AI 포토 스튜디오",
@@ -212,6 +214,8 @@ export const translations = {
     nav_start: "Get Started",
     nav_recharge: "Top Up Credits",
     nav_credits: "Credits",
+    nav_login: "Sign In",
+    nav_logout: "Sign Out",
 
     // Hero Section
     hero_badge: "AI Photo Studio",
@@ -399,6 +403,8 @@ export const translations = {
     nav_start: "เริ่มต้นใช้งาน",
     nav_recharge: "เติมเครดิต",
     nav_credits: "เครดิตคงเหลือ",
+    nav_login: "เข้าสู่ระบบ",
+    nav_logout: "ออกจากระบบ",
 
     // Hero Section
     hero_badge: "สตูดิโอภาพถ่าย AI",
@@ -586,6 +592,8 @@ export const translations = {
     nav_start: "Bắt đầu ngay",
     nav_recharge: "Nạp thêm lượt",
     nav_credits: "Lượt hiện có",
+    nav_login: "Đăng nhập",
+    nav_logout: "Đăng xuất",
 
     // Hero Section
     hero_badge: "Studio ảnh AI",
@@ -773,6 +781,8 @@ export const translations = {
     nav_start: "Mulai Sekarang",
     nav_recharge: "Isi Kredit",
     nav_credits: "Sisa Kredit",
+    nav_login: "Masuk",
+    nav_logout: "Keluar",
 
     // Hero Section
     hero_badge: "Studio Foto AI",

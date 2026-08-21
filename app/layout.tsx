@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Noto_Sans_KR, Outfit } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "./lib/i18n/LanguageContext";
+import { AuthProvider } from "./lib/auth/AuthContext";
 
 const notoSansKr = Noto_Sans_KR({
   subsets: ["latin"],
@@ -31,7 +32,9 @@ export default function RootLayout({
       <body
         className={`${notoSansKr.variable} ${outfit.variable} font-sans antialiased`}
       >
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

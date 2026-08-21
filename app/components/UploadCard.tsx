@@ -12,6 +12,7 @@ import {
 import { PRINT_SIZES, generatePhotoSheet, type PrintSize } from "../lib/photoSheet";
 import CompareSlider from "./CompareSlider";
 import { useTranslation } from "../lib/i18n/LanguageContext";
+import { useAuth } from "../lib/auth/AuthContext";
 
 interface ModelSuccessResult {
   success: true;
@@ -42,6 +43,7 @@ const FUN_STYLE_IDS = STYLES.filter((s) => s.category === "fun").map((s) => s.id
 
 export default function UploadCard() {
   const { t } = useTranslation();
+  const { user, loginWithGoogle } = useAuth();
   const [selfieBase64, setSelfieBase64] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [category, setCategory] = useState<CategoryId>("business");
@@ -93,6 +95,11 @@ export default function UploadCard() {
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     setError(null);
+    if (!user) {
+      alert("로그인이 필요합니다. Google 로그인 페이지로 이동합니다.");
+      loginWithGoogle();
+      return;
+    }
     const files = e.target.files;
     if (!files || files.length === 0) return;
     processFile(files[0]);
@@ -131,6 +138,11 @@ export default function UploadCard() {
   };
 
   const triggerFileInput = () => {
+    if (!user) {
+      alert("로그인이 필요합니다. Google 로그인 페이지로 이동합니다.");
+      loginWithGoogle();
+      return;
+    }
     fileInputRef.current?.click();
   };
 
@@ -148,6 +160,11 @@ export default function UploadCard() {
     e.preventDefault();
     setIsDragging(false);
     setError(null);
+    if (!user) {
+      alert("로그인이 필요합니다. Google 로그인 페이지로 이동합니다.");
+      loginWithGoogle();
+      return;
+    }
     const files = e.dataTransfer.files;
     if (!files || files.length === 0) return;
     processFile(files[0]);
