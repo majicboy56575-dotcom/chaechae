@@ -13,6 +13,7 @@ export default function PricingPage() {
   const { user, loginWithGoogle, logout, loading } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState<PricingPlan>(PRICING_PLANS[1]); // Default to Standard (10장)
   const [currentCredits, setCurrentCredits] = useState<number>(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [completedOrder, setCompletedOrder] = useState<{
     orderId: string;
     plan: PricingPlan;
@@ -67,21 +68,12 @@ export default function PricingPage() {
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b border-slate-100/80 bg-white/70 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             <Link href="/" className="flex items-center gap-1.5 sm:gap-2 group flex-shrink-0">
               <span className="font-extrabold text-xl sm:text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-indigo-950 font-outfit whitespace-nowrap">
                 Chae Chae
               </span>
               <span className="h-2 w-2 rounded-full bg-indigo-600 animate-pulse flex-shrink-0" />
-            </Link>
-            
-            {/* Mobile-visible Payment/Pricing Tab */}
-            <Link
-              href="/pricing"
-              className="text-xs sm:text-sm font-bold text-indigo-600 transition-colors flex items-center gap-1 whitespace-nowrap border-l border-slate-200 pl-3 md:hidden"
-            >
-              <span>💳</span>
-              <span>요금제</span>
             </Link>
           </div>
           <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
@@ -94,9 +86,9 @@ export default function PricingPage() {
               </span>
             </div>
             {loading ? (
-              <div className="w-8 h-8 rounded-full border border-indigo-100 bg-indigo-50 animate-pulse flex-shrink-0" />
+              <div className="hidden md:block w-8 h-8 rounded-full border border-indigo-100 bg-indigo-50 animate-pulse flex-shrink-0" />
             ) : user ? (
-              <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+              <div className="hidden md:flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
                 {user.photoURL ? (
                   <img
                     src={user.photoURL}
@@ -110,7 +102,7 @@ export default function PricingPage() {
                 )}
                 <button
                   onClick={logout}
-                  className="hidden sm:inline-flex text-xs font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 px-3 py-2 rounded-xl transition-all whitespace-nowrap flex-shrink-0"
+                  className="hidden md:inline-flex text-xs font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 px-3 py-2 rounded-xl transition-all whitespace-nowrap flex-shrink-0"
                 >
                   {t("nav_logout")}
                 </button>
@@ -118,7 +110,7 @@ export default function PricingPage() {
             ) : (
               <button
                 onClick={loginWithGoogle}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 px-2.5 py-2 sm:px-3.5 rounded-xl transition-all shadow-sm active:scale-[0.98] whitespace-nowrap flex-shrink-0"
+                className="hidden md:inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 px-2.5 py-2 sm:px-3.5 rounded-xl transition-all shadow-sm active:scale-[0.98] whitespace-nowrap flex-shrink-0"
               >
                 <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24">
                   <path
@@ -143,29 +135,135 @@ export default function PricingPage() {
             )}
             <Link
               href="/#upload-section"
-              className="bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold px-3 py-2.5 sm:px-4 rounded-xl transition-all shadow-sm active:scale-[0.98] whitespace-nowrap flex-shrink-0"
+              className="hidden md:inline-flex bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold px-3 py-2.5 sm:px-4 rounded-xl transition-all shadow-sm active:scale-[0.98] whitespace-nowrap flex-shrink-0"
             >
               {t("nav_start")}
             </Link>
+
+            {/* Mobile Hamburger Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 rounded-xl border border-slate-200 bg-white text-slate-700 hover:text-indigo-600 transition-colors md:hidden flex-shrink-0"
+              aria-label="Toggle menu"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                {isMobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
           </div>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-slate-100 bg-white/95 backdrop-blur-md px-6 py-5 flex flex-col gap-4 shadow-xl animate-fade-in">
+            <nav className="flex flex-col gap-3 text-sm font-bold text-slate-700">
+              <Link
+                href="/#how-it-works"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="hover:text-indigo-600 transition-colors py-2 border-b border-slate-50"
+              >
+                {t("nav_how_it_works")}
+              </Link>
+              <Link
+                href="/#showcase"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="hover:text-indigo-600 transition-colors py-2 border-b border-slate-50"
+              >
+                {t("nav_showcase")}
+              </Link>
+              <Link
+                href="/pricing"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="hover:text-indigo-600 transition-colors py-2 border-b border-slate-50 flex items-center gap-1.5 font-bold text-indigo-600"
+              >
+                <span>💳</span> {t("nav_pricing")}
+              </Link>
+            </nav>
+
+            <div className="h-px bg-slate-100 my-1" />
+
+            {loading ? (
+              <div className="w-8 h-8 rounded-full border border-indigo-100 bg-indigo-50 animate-pulse" />
+            ) : user ? (
+              <div className="flex items-center justify-between gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  {user.photoURL ? (
+                    <img
+                      src={user.photoURL}
+                      alt={user.displayName || "User"}
+                      className="w-9 h-9 rounded-full border border-indigo-200 object-cover flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full border border-indigo-200 bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold font-outfit flex-shrink-0">
+                      {user.displayName ? user.displayName[0].toUpperCase() : user.email ? user.email[0].toUpperCase() : "U"}
+                    </div>
+                  )}
+                  <div className="text-left min-w-0">
+                    <p className="text-xs font-bold text-slate-800 truncate">{user.displayName || user.email}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    logout();
+                  }}
+                  className="text-xs font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 px-3 py-2 rounded-xl transition-all whitespace-nowrap bg-white flex-shrink-0"
+                >
+                  {t("nav_logout")}
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  loginWithGoogle();
+                }}
+                className="inline-flex items-center justify-center gap-2 text-xs font-bold text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 w-full py-3 rounded-xl transition-all shadow-sm active:scale-[0.98]"
+              >
+                <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
+                  <path
+                    fill="#EA4335"
+                    d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582L19.91 3C17.782 1.145 15.055 0 12 0 7.33 0 3.327 2.68 1.386 6.582L5.266 9.765z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M16.04 15.345c-1.127.755-2.545 1.2-4.04 1.2a7.07 7.07 0 0 1-6.734-4.855L1.38 14.873C3.32 18.79 7.33 21.5 12 21.5c3.155 0 6.018-1.073 8.082-2.909l-4.042-3.246z"
+                  />
+                  <path
+                    fill="#4285F4"
+                    d="M23.49 12.273c0-.773-.073-1.527-.2-2.273H12v4.51h6.464a5.527 5.527 0 0 1-2.4 3.636l4.043 3.246c2.363-2.173 3.73-5.382 3.73-9.119z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.266 11.735a7.07 7.07 0 0 1 0-1.97L1.38 6.582A11.956 11.956 0 0 0 0 12c0 1.927.455 3.745 1.266 5.373l3.99-3.136a7.077 7.077 0 0 1 0-2.502z"
+                  />
+                </svg>
+                <span>{t("nav_login")}</span>
+              </button>
+            )}
+          </div>
+        )}
       </header>
 
       {/* Main Container */}
       <main className="max-w-6xl mx-auto px-6 pt-16 pb-24">
         {/* Hero Title */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 mb-6 shadow-sm">
+        <div className="text-center max-w-3xl mx-auto mb-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 mb-4 shadow-sm">
             <span>💳</span>
             <span>{t("pricing_badge")}</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.15] mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-[1.15] mb-3">
             {t("pricing_hero_title1")}<br />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600">
               {t("pricing_hero_title2")}
             </span>
           </h1>
-          <p className="text-slate-500 text-sm sm:text-base md:text-lg font-medium leading-relaxed max-w-xl mx-auto">
+          <p className="text-slate-500 text-xs sm:text-sm md:text-base font-medium leading-relaxed max-w-lg mx-auto">
             {t("pricing_hero_sub")}
           </p>
         </div>

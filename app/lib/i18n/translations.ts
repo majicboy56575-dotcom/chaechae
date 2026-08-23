@@ -33,7 +33,7 @@ export const translations = {
     hero_title_1: "셀카 한 장이면,",
     hero_title_2: "증명사진부터 컨셉 화보까지",
     hero_subtitle: "취업용 증명사진, 여권사진, 비즈니스 헤드샷, 아이돌 프로필, 나만의 커스텀 컨셉까지 — 스튜디오 예약 없이 5분 만에",
-    hero_cta: "내 헤드샷 만들기",
+    hero_cta: "내 사진 만들기",
     hero_badge_bottom: "카드 등록 불필요 · 12가지 스타일 + 커스텀 · 초고화질 완성",
     hero_chip_print: "🖨️ 인화용 시트 자동 생성",
 
@@ -148,7 +148,7 @@ export const translations = {
     // CTA Bottom
     cta_title: "지금 바로 나만의 AI 사진을 제작해 보세요",
     cta_desc: "스튜디오 예약 비용과 대기 시간 없이 — 증명사진, 헤드샷, 컨셉 화보를 지금 업로드 한 번으로 완성하세요.",
-    cta_btn: "내 헤드샷 만들기",
+    cta_btn: "내 사진 만들기",
 
     // Pricing Plans Data
     plan_starter_name: "5장 (Starter)",
