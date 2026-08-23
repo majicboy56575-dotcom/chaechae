@@ -42,11 +42,22 @@ export default function Home() {
       {/* Header / Navbar */}
       <header className="sticky top-0 z-50 w-full border-b border-slate-100/80 bg-white/70 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-            <span className="font-extrabold text-xl sm:text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-indigo-950 font-outfit whitespace-nowrap">
-              Chae Chae
-            </span>
-            <span className="h-2 w-2 rounded-full bg-indigo-600 animate-pulse flex-shrink-0" />
+          <div className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+              <span className="font-extrabold text-xl sm:text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-indigo-950 font-outfit whitespace-nowrap">
+                Chae Chae
+              </span>
+              <span className="h-2 w-2 rounded-full bg-indigo-600 animate-pulse flex-shrink-0" />
+            </Link>
+            
+            {/* Mobile-visible Payment/Pricing Tab */}
+            <Link
+              href="/pricing"
+              className="text-xs sm:text-sm font-bold text-slate-600 hover:text-indigo-600 transition-colors flex items-center gap-1 whitespace-nowrap border-l border-slate-200 pl-3 md:hidden"
+            >
+              <span>💳</span>
+              <span>요금제</span>
+            </Link>
           </div>
           <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
             <a href="#how-it-works" className="hover:text-indigo-600 transition-colors">

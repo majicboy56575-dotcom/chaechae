@@ -67,12 +67,23 @@ export default function PricingPage() {
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b border-slate-100/80 bg-white/70 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-1.5 sm:gap-2 group flex-shrink-0">
-            <span className="font-extrabold text-xl sm:text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-indigo-950 font-outfit whitespace-nowrap">
-              Chae Chae
-            </span>
-            <span className="h-2 w-2 rounded-full bg-indigo-600 animate-pulse flex-shrink-0" />
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-1.5 sm:gap-2 group flex-shrink-0">
+              <span className="font-extrabold text-xl sm:text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-indigo-950 font-outfit whitespace-nowrap">
+                Chae Chae
+              </span>
+              <span className="h-2 w-2 rounded-full bg-indigo-600 animate-pulse flex-shrink-0" />
+            </Link>
+            
+            {/* Mobile-visible Payment/Pricing Tab */}
+            <Link
+              href="/pricing"
+              className="text-xs sm:text-sm font-bold text-indigo-600 transition-colors flex items-center gap-1 whitespace-nowrap border-l border-slate-200 pl-3 md:hidden"
+            >
+              <span>💳</span>
+              <span>요금제</span>
+            </Link>
+          </div>
           <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
             <LanguageSelector />
             <div className="flex items-center gap-1 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full bg-indigo-50/80 border border-indigo-100/80 text-xs font-bold text-indigo-700 whitespace-nowrap flex-shrink-0">
@@ -158,6 +169,71 @@ export default function PricingPage() {
             {t("pricing_hero_sub")}
           </p>
         </div>
+
+        {/* User Login Status Card */}
+        {loading ? (
+          <div className="max-w-5xl mx-auto mb-8 p-4 rounded-2xl border border-indigo-100 bg-indigo-50/50 animate-pulse h-16 flex items-center justify-center">
+            <div className="w-5 h-5 rounded-full border-2 border-indigo-600 border-t-transparent animate-spin" />
+          </div>
+        ) : user ? (
+          <div className="max-w-5xl mx-auto mb-8 p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              {user.photoURL ? (
+                <img src={user.photoURL} alt={user.displayName || "User"} className="w-10 h-10 rounded-full border border-indigo-200 object-cover flex-shrink-0" />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-indigo-100 border border-indigo-200 text-indigo-700 flex items-center justify-center font-bold font-outfit text-sm flex-shrink-0">
+                  {user.displayName ? user.displayName[0].toUpperCase() : user.email ? user.email[0].toUpperCase() : "U"}
+                </div>
+              )}
+              <div className="text-left">
+                <p className="text-[10px] font-black text-indigo-500 uppercase tracking-wider">현재 로그인 계정</p>
+                <p className="text-sm font-bold text-slate-800">{user.displayName || user.email}</p>
+              </div>
+            </div>
+            <button
+              onClick={logout}
+              className="text-xs font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 px-3.5 py-2 rounded-xl transition-all whitespace-nowrap"
+            >
+              {t("nav_logout")}
+            </button>
+          </div>
+        ) : (
+          <div className="max-w-5xl mx-auto mb-8 p-4 rounded-2xl bg-amber-50/60 border border-amber-200/70 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-amber-100 border border-amber-200 text-amber-700 flex items-center justify-center text-lg flex-shrink-0">
+                ⚠️
+              </div>
+              <div className="text-left">
+                <p className="text-[10px] font-black text-amber-600 uppercase tracking-wider">로그인 상태</p>
+                <p className="text-xs font-bold text-amber-800">결제 및 크레딧 충전을 위해 로그인이 필요합니다.</p>
+              </div>
+            </div>
+            <button
+              onClick={loginWithGoogle}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 px-3.5 py-2.5 rounded-xl transition-all shadow-sm active:scale-[0.98] whitespace-nowrap"
+            >
+              <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24">
+                <path
+                  fill="#EA4335"
+                  d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582L19.91 3C17.782 1.145 15.055 0 12 0 7.33 0 3.327 2.68 1.386 6.582L5.266 9.765z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M16.04 15.345c-1.127.755-2.545 1.2-4.04 1.2a7.07 7.07 0 0 1-6.734-4.855L1.38 14.873C3.32 18.79 7.33 21.5 12 21.5c3.155 0 6.018-1.073 8.082-2.909l-4.042-3.246z"
+                />
+                <path
+                  fill="#4285F4"
+                  d="M23.49 12.273c0-.773-.073-1.527-.2-2.273H12v4.51h6.464a5.527 5.527 0 0 1-2.4 3.636l4.043 3.246c2.363-2.173 3.73-5.382 3.73-9.119z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.266 11.735a7.07 7.07 0 0 1 0-1.97L1.38 6.582A11.956 11.956 0 0 0 0 12c0 1.927.455 3.745 1.266 5.373l3.99-3.136a7.077 7.077 0 0 1 0-2.502z"
+                />
+              </svg>
+              <span>{t("nav_login")}</span>
+            </button>
+          </div>
+        )}
 
         {/* Pricing Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch max-w-5xl mx-auto mb-16">
