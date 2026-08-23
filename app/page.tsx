@@ -41,12 +41,12 @@ export default function Home() {
 
       {/* Header / Navbar */}
       <header className="sticky top-0 z-50 w-full border-b border-slate-100/80 bg-white/70 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="font-extrabold text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-indigo-950 font-outfit">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+            <span className="font-extrabold text-xl sm:text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-indigo-950 font-outfit whitespace-nowrap">
               Chae Chae
             </span>
-            <span className="h-2 w-2 rounded-full bg-indigo-600 animate-pulse" />
+            <span className="h-2 w-2 rounded-full bg-indigo-600 animate-pulse flex-shrink-0" />
           </div>
           <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
             <a href="#how-it-works" className="hover:text-indigo-600 transition-colors">
@@ -59,38 +59,39 @@ export default function Home() {
               <span>💳</span> {t("nav_pricing")}
             </Link>
           </nav>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
             <LanguageSelector />
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50/80 border border-indigo-100/80 text-xs font-bold text-indigo-700">
-              <span>{t("nav_credits")}:</span>
-              <span className="bg-indigo-600 text-white px-2 py-0.5 rounded-full text-[11px]">
+            <div className="flex items-center gap-1 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full bg-indigo-50/80 border border-indigo-100/80 text-xs font-bold text-indigo-700 whitespace-nowrap flex-shrink-0">
+              <span className="hidden sm:inline">{t("nav_credits")}:</span>
+              <span className="sm:hidden">🪙</span>
+              <span className="bg-indigo-600 text-white px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] flex-shrink-0 font-extrabold">
                 {currentCredits}
               </span>
             </div>
             <Link
               href="/pricing"
-              className="hidden sm:inline-flex text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 px-3 py-2 rounded-xl transition-all"
+              className="hidden sm:inline-flex text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 px-3 py-2 rounded-xl transition-all whitespace-nowrap flex-shrink-0"
             >
               {t("nav_recharge")}
             </Link>
             {loading ? (
-              <div className="w-8 h-8 rounded-full border border-indigo-100 bg-indigo-50 animate-pulse" />
+              <div className="w-8 h-8 rounded-full border border-indigo-100 bg-indigo-50 animate-pulse flex-shrink-0" />
             ) : user ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
                 {user.photoURL ? (
                   <img
                     src={user.photoURL}
                     alt={user.displayName || "User"}
-                    className="w-8 h-8 rounded-full border border-indigo-200 object-cover"
+                    className="w-8 h-8 rounded-full border border-indigo-200 object-cover flex-shrink-0"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full border border-indigo-200 bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold font-outfit">
+                  <div className="w-8 h-8 rounded-full border border-indigo-200 bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold font-outfit flex-shrink-0">
                     {user.displayName ? user.displayName[0].toUpperCase() : user.email ? user.email[0].toUpperCase() : "U"}
                   </div>
                 )}
                 <button
                   onClick={logout}
-                  className="text-xs font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 px-3 py-2 rounded-xl transition-all"
+                  className="hidden sm:inline-flex text-xs font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 px-3 py-2 rounded-xl transition-all whitespace-nowrap flex-shrink-0"
                 >
                   {t("nav_logout")}
                 </button>
@@ -98,9 +99,9 @@ export default function Home() {
             ) : (
               <button
                 onClick={loginWithGoogle}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 px-3.5 py-2 rounded-xl transition-all shadow-sm active:scale-[0.98]"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 px-2.5 py-2 sm:px-3.5 rounded-xl transition-all shadow-sm active:scale-[0.98] whitespace-nowrap flex-shrink-0"
               >
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24">
                   <path
                     fill="#EA4335"
                     d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582L19.91 3C17.782 1.145 15.055 0 12 0 7.33 0 3.327 2.68 1.386 6.582L5.266 9.765z"
@@ -118,12 +119,12 @@ export default function Home() {
                     d="M5.266 11.735a7.07 7.07 0 0 1 0-1.97L1.38 6.582A11.956 11.956 0 0 0 0 12c0 1.927.455 3.745 1.266 5.373l3.99-3.136a7.077 7.077 0 0 1 0-2.502z"
                   />
                 </svg>
-                <span>{t("nav_login")}</span>
+                <span className="hidden sm:inline">{t("nav_login")}</span>
               </button>
             )}
             <button
               onClick={scrollToUpload}
-              className="bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl transition-all duration-200 shadow-md shadow-slate-950/5 active:scale-[0.98]"
+              className="bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl transition-all duration-200 shadow-md shadow-slate-950/5 active:scale-[0.98] whitespace-nowrap flex-shrink-0"
             >
               {t("nav_start")}
             </button>

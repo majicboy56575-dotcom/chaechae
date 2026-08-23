@@ -6,9 +6,11 @@ import { PRICING_PLANS, type PricingPlan, getLocalCredits } from "../lib/pricing
 import PayPalButton from "../components/PayPalButton";
 import LanguageSelector from "../components/LanguageSelector";
 import { useTranslation } from "../lib/i18n/LanguageContext";
+import { useAuth } from "../lib/auth/AuthContext";
 
 export default function PricingPage() {
   const { t } = useTranslation();
+  const { user, loginWithGoogle, logout, loading } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState<PricingPlan>(PRICING_PLANS[1]); // Default to Standard (10장)
   const [currentCredits, setCurrentCredits] = useState<number>(0);
   const [completedOrder, setCompletedOrder] = useState<{
@@ -64,24 +66,73 @@ export default function PricingPage() {
 
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b border-slate-100/80 bg-white/70 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <span className="font-extrabold text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-indigo-950 font-outfit">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-1.5 sm:gap-2 group flex-shrink-0">
+            <span className="font-extrabold text-xl sm:text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-indigo-950 font-outfit whitespace-nowrap">
               Chae Chae
             </span>
-            <span className="h-2 w-2 rounded-full bg-indigo-600 animate-pulse" />
+            <span className="h-2 w-2 rounded-full bg-indigo-600 animate-pulse flex-shrink-0" />
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
             <LanguageSelector />
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50/80 border border-indigo-100/80 text-xs font-bold text-indigo-700">
-              <span>{t("nav_credits")}:</span>
-              <span className="bg-indigo-600 text-white px-2 py-0.5 rounded-full text-[11px]">
+            <div className="flex items-center gap-1 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full bg-indigo-50/80 border border-indigo-100/80 text-xs font-bold text-indigo-700 whitespace-nowrap flex-shrink-0">
+              <span className="hidden sm:inline">{t("nav_credits")}:</span>
+              <span className="sm:hidden">🪙</span>
+              <span className="bg-indigo-600 text-white px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] flex-shrink-0 font-extrabold">
                 {currentCredits}
               </span>
             </div>
+            {loading ? (
+              <div className="w-8 h-8 rounded-full border border-indigo-100 bg-indigo-50 animate-pulse flex-shrink-0" />
+            ) : user ? (
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                {user.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt={user.displayName || "User"}
+                    className="w-8 h-8 rounded-full border border-indigo-200 object-cover flex-shrink-0"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full border border-indigo-200 bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold font-outfit flex-shrink-0">
+                    {user.displayName ? user.displayName[0].toUpperCase() : user.email ? user.email[0].toUpperCase() : "U"}
+                  </div>
+                )}
+                <button
+                  onClick={logout}
+                  className="hidden sm:inline-flex text-xs font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 px-3 py-2 rounded-xl transition-all whitespace-nowrap flex-shrink-0"
+                >
+                  {t("nav_logout")}
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={loginWithGoogle}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 px-2.5 py-2 sm:px-3.5 rounded-xl transition-all shadow-sm active:scale-[0.98] whitespace-nowrap flex-shrink-0"
+              >
+                <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24">
+                  <path
+                    fill="#EA4335"
+                    d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582L19.91 3C17.782 1.145 15.055 0 12 0 7.33 0 3.327 2.68 1.386 6.582L5.266 9.765z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M16.04 15.345c-1.127.755-2.545 1.2-4.04 1.2a7.07 7.07 0 0 1-6.734-4.855L1.38 14.873C3.32 18.79 7.33 21.5 12 21.5c3.155 0 6.018-1.073 8.082-2.909l-4.042-3.246z"
+                  />
+                  <path
+                    fill="#4285F4"
+                    d="M23.49 12.273c0-.773-.073-1.527-.2-2.273H12v4.51h6.464a5.527 5.527 0 0 1-2.4 3.636l4.043 3.246c2.363-2.173 3.73-5.382 3.73-9.119z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.266 11.735a7.07 7.07 0 0 1 0-1.97L1.38 6.582A11.956 11.956 0 0 0 0 12c0 1.927.455 3.745 1.266 5.373l3.99-3.136a7.077 7.077 0 0 1 0-2.502z"
+                  />
+                </svg>
+                <span className="hidden sm:inline">{t("nav_login")}</span>
+              </button>
+            )}
             <Link
               href="/#upload-section"
-              className="bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm active:scale-[0.98]"
+              className="bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold px-3 py-2.5 sm:px-4 rounded-xl transition-all shadow-sm active:scale-[0.98] whitespace-nowrap flex-shrink-0"
             >
               {t("nav_start")}
             </Link>
@@ -230,16 +281,62 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* PayPal Payment Component */}
-          <div className="mb-4">
-            <p className="text-xs text-slate-500 font-bold mb-3 text-center">
-              {t("pricing_paypal_guide")}
-            </p>
-            <PayPalButton
-              plan={selectedPlan}
-              onSuccess={handlePaymentSuccess}
-            />
-          </div>
+          {/* Checkout Login/Payment Flow */}
+          {loading ? (
+            <div className="mb-6 p-6 rounded-2xl border border-indigo-100 bg-indigo-50/50 flex items-center justify-center">
+              <div className="w-6 h-6 rounded-full border-2 border-indigo-600 border-t-transparent animate-spin" />
+            </div>
+          ) : user ? (
+            <>
+              <div className="mb-5 p-3.5 rounded-2xl bg-indigo-50/65 border border-indigo-100 text-xs font-semibold text-indigo-950 flex items-center gap-2">
+                <span className="text-sm">👤</span>
+                <div>
+                  결제 완료 시 <span className="font-bold text-indigo-700">{user.displayName || user.email}</span> 계정으로 즉시 크레딧이 충전됩니다.
+                </div>
+              </div>
+              <div className="mb-4">
+                <p className="text-xs text-slate-500 font-bold mb-3 text-center">
+                  {t("pricing_paypal_guide")}
+                </p>
+                <PayPalButton
+                  plan={selectedPlan}
+                  onSuccess={handlePaymentSuccess}
+                />
+              </div>
+            </>
+          ) : (
+            <div className="mb-6 p-6 rounded-2xl bg-amber-50/60 border border-amber-200/70 text-center flex flex-col items-center">
+              <span className="text-2xl mb-2">⚠️</span>
+              <h5 className="text-xs font-black text-amber-800 uppercase tracking-wider mb-1">로그인이 필요합니다</h5>
+              <p className="text-[11px] font-bold text-amber-700 max-w-xs mb-4 leading-relaxed">
+                결제 완료 후 크레딧을 안전하게 적립하기 위해 먼저 계정 로그인을 진행해 주세요.
+              </p>
+              <button
+                onClick={loginWithGoogle}
+                className="inline-flex items-center gap-2 text-xs font-bold text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 px-5 py-3 rounded-xl transition-all shadow-sm active:scale-[0.98]"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24">
+                  <path
+                    fill="#EA4335"
+                    d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582L19.91 3C17.782 1.145 15.055 0 12 0 7.33 0 3.327 2.68 1.386 6.582L5.266 9.765z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M16.04 15.345c-1.127.755-2.545 1.2-4.04 1.2a7.07 7.07 0 0 1-6.734-4.855L1.38 14.873C3.32 18.79 7.33 21.5 12 21.5c3.155 0 6.018-1.073 8.082-2.909l-4.042-3.246z"
+                  />
+                  <path
+                    fill="#4285F4"
+                    d="M23.49 12.273c0-.773-.073-1.527-.2-2.273H12v4.51h6.464a5.527 5.527 0 0 1-2.4 3.636l4.043 3.246c2.363-2.173 3.73-5.382 3.73-9.119z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.266 11.735a7.07 7.07 0 0 1 0-1.97L1.38 6.582A11.956 11.956 0 0 0 0 12c0 1.927.455 3.745 1.266 5.373l3.99-3.136a7.077 7.077 0 0 1 0-2.502z"
+                  />
+                </svg>
+                <span>Google 계정으로 로그인</span>
+              </button>
+            </div>
+          )}
 
           {/* Trust Badges */}
           <div className="pt-4 border-t border-slate-100/80 grid grid-cols-3 gap-2 text-center text-[10px] text-slate-400 font-bold">
