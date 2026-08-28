@@ -46,7 +46,7 @@ export default function Home() {
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             <Link href="/" className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
               <span className="font-extrabold text-xl sm:text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-indigo-950 font-outfit whitespace-nowrap">
-                Chae Chae
+                Monopic
               </span>
               <span className="h-2 w-2 rounded-full bg-indigo-600 animate-pulse flex-shrink-0" />
             </Link>
@@ -328,7 +328,7 @@ export default function Home() {
               </svg>
             </div>
             <span className="text-[10px] font-extrabold text-indigo-600 tracking-wider uppercase bg-indigo-50 px-2.5 py-0.5 rounded-full">
-              Chae Chae AI
+              Monopic AI
             </span>
           </div>
 
@@ -527,10 +527,13 @@ export default function Home() {
       <footer className="border-t border-slate-100 bg-white py-12 px-6">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-slate-500">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-700 font-outfit">Chae Chae</span>
+            <span className="font-bold text-slate-700 font-outfit">Monopic</span>
           </div>
-          <div>
-            <p>© 2026 Chae Chae. All rights reserved.</p>
+          <div className="flex items-center gap-6 text-xs text-slate-400 font-medium">
+            <Link href="/privacy" className="hover:text-indigo-600 transition-colors">
+              개인정보처리방침 (Privacy Policy)
+            </Link>
+            <p>© 2026 Monopic. All rights reserved.</p>
           </div>
         </div>
       </footer>

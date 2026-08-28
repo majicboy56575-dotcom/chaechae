@@ -70,7 +70,7 @@ export default function PayPalButton({ plan, onSuccess, onError }: PayPalButtonP
                 intent: "CAPTURE",
                 purchase_units: [
                   {
-                    description: `Chae Chae AI - ${localizedPlanName} (${plan.count} credits)`,
+                    description: `Monopic AI - ${localizedPlanName} (${plan.count} credits)`,
                     amount: {
                       currency_code: "USD",
                       value: plan.price.toFixed(2),

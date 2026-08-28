@@ -17,7 +17,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Chae Chae — Professional AI Headshot & Photo Studio",
+  title: "Monopic — Professional AI Headshot & Photo Studio",
   description:
     "Generate professional resume headshots, passport photos, and creative studio portraits from a single selfie in seconds.",
 };

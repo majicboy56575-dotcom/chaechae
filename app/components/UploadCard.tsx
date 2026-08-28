@@ -268,11 +268,11 @@ export default function UploadCard() {
   const handleShare = async (imageUrl: string, label: string) => {
     try {
       const blob = await (await fetch(imageUrl)).blob();
-      const file = new File([blob], `chae_chae_${usedStyleId}.png`, { type: blob.type });
+      const file = new File([blob], `monopic_${usedStyleId}.png`, { type: blob.type });
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({
-          title: `Chae Chae — ${label}`,
-          text: "Chae Chae AI Headshot 📸",
+          title: `Monopic — ${label}`,
+          text: "Monopic AI Headshot 📸",
           files: [file],
         });
       } else {
@@ -299,7 +299,7 @@ export default function UploadCard() {
       const { dataUrl, count } = await generatePhotoSheet(best.imageUrl, size);
       const a = document.createElement("a");
       a.href = dataUrl;
-      a.download = `chae_chae_sheet_${size.id}_${count}cut.png`;
+      a.download = `monopic_sheet_${size.id}_${count}cut.png`;
       a.click();
     } catch (err) {
       console.error(err);
@@ -385,7 +385,7 @@ export default function UploadCard() {
                 <div className="w-full flex gap-2">
                   <a
                     href={bestResult.imageUrl}
-                    download={`chae_chae_${usedStyleId}.png`}
+                    download={`monopic_${usedStyleId}.png`}
                     className="flex-1 text-white text-xs font-bold py-3 px-4 rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors bg-slate-900 hover:bg-slate-800"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
