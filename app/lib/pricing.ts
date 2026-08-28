@@ -97,7 +97,7 @@ export function addLocalCredits(amount: number): number {
   }
 }
 
-export function useLocalCredit(): boolean {
+export function consumeLocalCredit(): boolean {
   if (typeof window === "undefined") return true;
   try {
     const current = getLocalCredits();

@@ -10,6 +10,7 @@ import {
   type CategoryId,
 } from "../lib/styles";
 import { PRINT_SIZES, generatePhotoSheet, type PrintSize } from "../lib/photoSheet";
+import { getLocalCredits, consumeLocalCredit } from "../lib/pricing";
 import CompareSlider from "./CompareSlider";
 import { useTranslation } from "../lib/i18n/LanguageContext";
 import { useAuth } from "../lib/auth/AuthContext";
@@ -58,8 +59,17 @@ export default function UploadCard() {
   const [usedStyleId, setUsedStyleId] = useState<string>("corporate");
   const [printSizeId, setPrintSizeId] = useState<string>(PRINT_SIZES[1].id);
   const [isSheetGenerating, setIsSheetGenerating] = useState(false);
+  const [credits, setCredits] = useState<number>(0);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync credits
+  useEffect(() => {
+    setCredits(getLocalCredits());
+    const handleCreditUpdate = () => setCredits(getLocalCredits());
+    window.addEventListener("chae_chae_credits_updated", handleCreditUpdate);
+    return () => window.removeEventListener("chae_chae_credits_updated", handleCreditUpdate);
+  }, []);
 
   // Rotate fun loading messages
   useEffect(() => {
@@ -198,7 +208,19 @@ export default function UploadCard() {
   };
 
   const handleSubmit = async () => {
+    if (!user) {
+      alert("로그인이 필요합니다. Google 로그인 페이지로 이동합니다.");
+      loginWithGoogle();
+      return;
+    }
     if (!selfieBase64) return;
+
+    const availableCredits = getLocalCredits();
+    if (availableCredits <= 0) {
+      setError(t("error_no_credits") || "보유 크레딧이 부족합니다. 요금제에서 크레딧을 충전해 주세요.");
+      return;
+    }
+
     if (selectedStyleId === "custom" && !customPrompt.trim()) {
       setError("Please enter a custom style description.");
       return;
@@ -226,6 +248,9 @@ export default function UploadCard() {
       if (!response.ok) {
         throw new Error(data.error || "Failed to generate AI image.");
       }
+
+      // Deduct 1 credit upon success
+      consumeLocalCredit();
 
       setUsedStyleId(selectedStyleId);
       setResult({
@@ -575,11 +600,21 @@ export default function UploadCard() {
         </div>
 
         {error && (
-          <div className="mt-2.5 flex items-center gap-1.5 text-xs font-bold text-rose-500 bg-rose-50/50 border border-rose-100 p-2.5 rounded-xl animate-shake">
-            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <span>{error}</span>
+          <div className="mt-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 p-3 rounded-xl animate-fade-in">
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span>{error}</span>
+            </div>
+            {credits <= 0 && (
+              <a
+                href="/pricing"
+                className="inline-flex items-center justify-center gap-1 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-extrabold shadow-sm transition-colors whitespace-nowrap"
+              >
+                {t("btn_go_to_pricing")}
+              </a>
+            )}
           </div>
         )}
       </div>

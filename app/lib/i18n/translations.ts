@@ -29,6 +29,8 @@ export const translations = {
     nav_credits: "보유 크레딧",
     nav_login: "로그인",
     nav_logout: "로그아웃",
+    error_no_credits: "보유 크레딧이 부족합니다. 요금제에서 크레딧을 충전해 주세요.",
+    btn_go_to_pricing: "크레딧 충전하기 💳",
 
     // Hero Section
     hero_badge: "AI 포토 스튜디오",
@@ -218,6 +220,8 @@ export const translations = {
     nav_credits: "Credits",
     nav_login: "Sign In",
     nav_logout: "Sign Out",
+    error_no_credits: "Insufficient credits. Please top up your credits on the pricing page.",
+    btn_go_to_pricing: "Top Up Credits 💳",
 
     // Hero Section
     hero_badge: "AI Photo Studio",
@@ -407,6 +411,8 @@ export const translations = {
     nav_credits: "เครดิตคงเหลือ",
     nav_login: "เข้าสู่ระบบ",
     nav_logout: "ออกจากระบบ",
+    error_no_credits: "เครดิตของคุณไม่เพียงพอ กรุณาเติมเครดิตในหน้าแพ็กเกจ",
+    btn_go_to_pricing: "เติมเครดิต 💳",
 
     // Hero Section
     hero_badge: "สตูดิโอภาพถ่าย AI",
@@ -596,6 +602,8 @@ export const translations = {
     nav_credits: "Lượt hiện có",
     nav_login: "Đăng nhập",
     nav_logout: "Đăng xuất",
+    error_no_credits: "Bạn không đủ lượt (credit). Vui lòng nạp thêm tại trang bảng giá.",
+    btn_go_to_pricing: "Nạp thêm lượt 💳",
 
     // Hero Section
     hero_badge: "Studio ảnh AI",
@@ -785,6 +793,8 @@ export const translations = {
     nav_credits: "Sisa Kredit",
     nav_login: "Masuk",
     nav_logout: "Keluar",
+    error_no_credits: "Kredit Anda tidak mencukupi. Silakan isi ulang kredit di halaman harga.",
+    btn_go_to_pricing: "Isi Ulang Kredit 💳",
 
     // Hero Section
     hero_badge: "Studio Foto AI",
@@ -974,6 +984,8 @@ export const translations = {
     nav_credits: "ক্রেডিট",
     nav_login: "সাইন ইন",
     nav_logout: "সাইন আউট",
+    error_no_credits: "আপনার পর্যাপ্ত ক্রেডিট নেই। অনুগ্রহ করে মূল্য নির্ধারণ পৃষ্ঠা থেকে ক্রেডিট টপ আপ করুন।",
+    btn_go_to_pricing: "ক্রেডিট টপ আপ করুন 💳",
 
     // Hero Section
     hero_badge: "এআই ফটো স্টুডিও",
@@ -1163,6 +1175,8 @@ export const translations = {
     nav_credits: "Baki Kredit",
     nav_login: "Log Masuk",
     nav_logout: "Log Keluar",
+    error_no_credits: "Baki kredit tidak mencukupi. Sila tambah nilai kredit di halaman harga.",
+    btn_go_to_pricing: "Tambah Nilai Kredit 💳",
 
     // Hero Section
     hero_badge: "Studio Foto AI",
