@@ -11,11 +11,7 @@ const firebaseConfig = {
 };
 
 // Prevent multiple initializations in Next.js hot-reloading
-// During server-side build, if apiKey is missing, we use a fallback mock config to prevent initializeApp/getAuth from throwing
-const isConfigValid = !!firebaseConfig.apiKey;
-const activeConfig = isConfigValid ? firebaseConfig : { ...firebaseConfig, apiKey: "mock-api-key-for-build" };
-
-const app = getApps().length > 0 ? getApp() : initializeApp(activeConfig);
+const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 export { app, auth };
