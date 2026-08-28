@@ -69,6 +69,36 @@ export function getPlan(id: string): PricingPlan | undefined {
   return PRICING_PLANS.find((p) => p.id === id);
 }
 
+// ─── Daily Free Generations Event Configuration ─────────────────
+// Set to false to instantly turn off the daily free event without breaking anything.
+export const ENABLE_DAILY_FREE_EVENT = true;
+export const DAILY_FREE_LIMIT = 2;
+
+function getTodayKey(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `chae_daily_free_${year}-${month}-${day}`;
+}
+
+export function getDailyFreeRemaining(): number {
+  if (!ENABLE_DAILY_FREE_EVENT || typeof window === "undefined") return 0;
+  try {
+    const raw = localStorage.getItem(getTodayKey());
+    const used = raw ? parseInt(raw, 10) : 0;
+    return Math.max(0, DAILY_FREE_LIMIT - (isNaN(used) ? 0 : used));
+  } catch {
+    return 0;
+  }
+}
+
+export function getTotalAvailableCredits(): number {
+  const free = getDailyFreeRemaining();
+  const purchased = getLocalCredits();
+  return free + purchased;
+}
+
 // Local storage credit helper for seamless UX
 const CREDIT_STORAGE_KEY = "chae_chae_user_credits";
 
@@ -100,6 +130,20 @@ export function addLocalCredits(amount: number): number {
 export function consumeLocalCredit(): boolean {
   if (typeof window === "undefined") return true;
   try {
+    // 1. Consume daily free credit first if available
+    if (ENABLE_DAILY_FREE_EVENT) {
+      const freeRemaining = getDailyFreeRemaining();
+      if (freeRemaining > 0) {
+        const todayKey = getTodayKey();
+        const raw = localStorage.getItem(todayKey);
+        const used = raw ? parseInt(raw, 10) : 0;
+        localStorage.setItem(todayKey, ((isNaN(used) ? 0 : used) + 1).toString());
+        window.dispatchEvent(new Event("chae_chae_credits_updated"));
+        return true;
+      }
+    }
+
+    // 2. Consume purchased credits
     const current = getLocalCredits();
     if (current <= 0) return false;
     localStorage.setItem(CREDIT_STORAGE_KEY, (current - 1).toString());

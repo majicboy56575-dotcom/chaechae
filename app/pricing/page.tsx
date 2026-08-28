@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { PRICING_PLANS, type PricingPlan, getLocalCredits } from "../lib/pricing";
+import { PRICING_PLANS, type PricingPlan, getTotalAvailableCredits } from "../lib/pricing";
 import PayPalButton from "../components/PayPalButton";
 import LanguageSelector from "../components/LanguageSelector";
 import { useTranslation } from "../lib/i18n/LanguageContext";
@@ -20,15 +20,15 @@ export default function PricingPage() {
   } | null>(null);
 
   useEffect(() => {
-    setCurrentCredits(getLocalCredits());
-    const handleUpdate = () => setCurrentCredits(getLocalCredits());
+    setCurrentCredits(getTotalAvailableCredits());
+    const handleUpdate = () => setCurrentCredits(getTotalAvailableCredits());
     window.addEventListener("chae_chae_credits_updated", handleUpdate);
     return () => window.removeEventListener("chae_chae_credits_updated", handleUpdate);
   }, []);
 
   const handlePaymentSuccess = (orderId: string, plan: PricingPlan) => {
     setCompletedOrder({ orderId, plan });
-    setCurrentCredits(getLocalCredits());
+    setCurrentCredits(getTotalAvailableCredits());
   };
 
   const getPlanName = (plan: PricingPlan) => {

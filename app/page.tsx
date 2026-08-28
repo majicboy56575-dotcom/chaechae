@@ -7,7 +7,7 @@ import UploadCard from "./components/UploadCard";
 import LanguageSelector from "./components/LanguageSelector";
 import { useTranslation } from "./lib/i18n/LanguageContext";
 import { CATEGORIES, STYLES } from "./lib/styles";
-import { getLocalCredits } from "./lib/pricing";
+import { getTotalAvailableCredits } from "./lib/pricing";
 import { useAuth } from "./lib/auth/AuthContext";
 
 export default function Home() {
@@ -17,8 +17,8 @@ export default function Home() {
   const { user, loginWithGoogle, logout, loading } = useAuth();
 
   useEffect(() => {
-    setCurrentCredits(getLocalCredits());
-    const handleUpdate = () => setCurrentCredits(getLocalCredits());
+    setCurrentCredits(getTotalAvailableCredits());
+    const handleUpdate = () => setCurrentCredits(getTotalAvailableCredits());
     window.addEventListener("chae_chae_credits_updated", handleUpdate);
     return () => window.removeEventListener("chae_chae_credits_updated", handleUpdate);
   }, []);

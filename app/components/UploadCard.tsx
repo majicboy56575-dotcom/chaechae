@@ -10,7 +10,7 @@ import {
   type CategoryId,
 } from "../lib/styles";
 import { PRINT_SIZES, generatePhotoSheet, type PrintSize } from "../lib/photoSheet";
-import { getLocalCredits, consumeLocalCredit } from "../lib/pricing";
+import { getTotalAvailableCredits, consumeLocalCredit } from "../lib/pricing";
 import CompareSlider from "./CompareSlider";
 import { useTranslation } from "../lib/i18n/LanguageContext";
 import { useAuth } from "../lib/auth/AuthContext";
@@ -65,8 +65,8 @@ export default function UploadCard() {
 
   // Sync credits
   useEffect(() => {
-    setCredits(getLocalCredits());
-    const handleCreditUpdate = () => setCredits(getLocalCredits());
+    setCredits(getTotalAvailableCredits());
+    const handleCreditUpdate = () => setCredits(getTotalAvailableCredits());
     window.addEventListener("chae_chae_credits_updated", handleCreditUpdate);
     return () => window.removeEventListener("chae_chae_credits_updated", handleCreditUpdate);
   }, []);
@@ -215,7 +215,7 @@ export default function UploadCard() {
     }
     if (!selfieBase64) return;
 
-    const availableCredits = getLocalCredits();
+    const availableCredits = getTotalAvailableCredits();
     if (availableCredits <= 0) {
       setError(t("error_no_credits") || "보유 크레딧이 부족합니다. 요금제에서 크레딧을 충전해 주세요.");
       return;
