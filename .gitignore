@@ -34,3 +34,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# android & release security (do NOT push to GitHub)
+*.jks
+*.keystore
+*.aab
+*.apk
+LOCAL_RELEASE_NOTES.md
+DEPLOY_MANUAL.md
+
