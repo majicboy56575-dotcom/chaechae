@@ -11,14 +11,14 @@ import {
 interface LanguageContextType {
   language: SupportedLanguage;
   setLanguage: (lang: SupportedLanguage) => void;
-  t: (key: keyof typeof translations.ko) => string;
+  t: (key: keyof typeof translations.ms) => string;
   languages: LanguageInfo[];
   currentLanguageInfo: LanguageInfo;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-const LANGUAGE_STORAGE_KEY = "chae_chae_selected_lang";
+const LANGUAGE_STORAGE_KEY = "monopic_selected_lang";
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<SupportedLanguage>("ms");
@@ -28,15 +28,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       const saved = localStorage.getItem(LANGUAGE_STORAGE_KEY) as SupportedLanguage | null;
       if (saved && SUPPORTED_LANGUAGES.some((l) => l.code === saved)) {
         setLanguageState(saved);
+        document.documentElement.lang = saved;
       } else {
-        // Check browser language
-        const browserLang = navigator.language.slice(0, 2).toLowerCase();
-        const matched = SUPPORTED_LANGUAGES.find((l) => l.code === browserLang);
-        if (matched) {
-          setLanguageState(matched.code);
-        } else {
-          setLanguageState("ms");
-        }
+        // Default to Malay
+        setLanguageState("ms");
+        document.documentElement.lang = "ms";
       }
     } catch {
       // ignore

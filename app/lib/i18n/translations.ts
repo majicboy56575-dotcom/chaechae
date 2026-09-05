@@ -9,13 +9,13 @@ export interface LanguageInfo {
 }
 
 export const SUPPORTED_LANGUAGES: LanguageInfo[] = [
-  { code: "ko", name: "Korean", nativeName: "한국어", flag: "🇰🇷", paypalLocale: "ko_KR" },
+  { code: "ms", name: "Malay", nativeName: "Bahasa Melayu", flag: "🇲🇾", paypalLocale: "en_US" },
   { code: "en", name: "English", nativeName: "English", flag: "🇺🇸", paypalLocale: "en_US" },
+  { code: "ko", name: "Korean", nativeName: "한국어", flag: "🇰🇷", paypalLocale: "ko_KR" },
   { code: "th", name: "Thai", nativeName: "ไทย", flag: "🇹🇭", paypalLocale: "th_TH" },
   { code: "vi", name: "Vietnamese", nativeName: "Tiếng Việt", flag: "🇻🇳", paypalLocale: "vi_VN" },
   { code: "id", name: "Indonesian", nativeName: "Bahasa Indonesia", flag: "🇮🇩", paypalLocale: "id_ID" },
   { code: "bn", name: "Bengali", nativeName: "বাংলা", flag: "🇧🇩", paypalLocale: "en_US" },
-  { code: "ms", name: "Malay", nativeName: "Bahasa Melayu", flag: "🇲🇾", paypalLocale: "en_US" },
   { code: "hi", name: "Hindi", nativeName: "हिन्दी", flag: "🇮🇳", paypalLocale: "en_US" },
 ];
 
