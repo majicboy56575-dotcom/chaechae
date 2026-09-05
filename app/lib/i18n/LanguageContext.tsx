@@ -21,7 +21,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 const LANGUAGE_STORAGE_KEY = "chae_chae_selected_lang";
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<SupportedLanguage>("th");
+  const [language, setLanguageState] = useState<SupportedLanguage>("ms");
 
   useEffect(() => {
     try {
@@ -35,7 +35,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         if (matched) {
           setLanguageState(matched.code);
         } else {
-          setLanguageState("th");
+          setLanguageState("ms");
         }
       }
     } catch {
@@ -53,14 +53,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const t = (key: keyof typeof translations.th): string => {
-    const langDict = translations[language] || translations.th;
-    return (langDict[key] as string) || (translations.th[key] as string) || key;
+  const t = (key: keyof typeof translations.ms): string => {
+    const langDict = translations[language] || translations.ms;
+    return (langDict[key] as string) || (translations.ms[key] as string) || key;
   };
 
   const currentLanguageInfo =
     SUPPORTED_LANGUAGES.find((l) => l.code === language) || 
-    SUPPORTED_LANGUAGES.find((l) => l.code === "th") || 
+    SUPPORTED_LANGUAGES.find((l) => l.code === "ms") || 
     SUPPORTED_LANGUAGES[0];
 
   return (
