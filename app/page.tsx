@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import UploadCard from "./components/UploadCard";
 import LanguageSelector from "./components/LanguageSelector";
+import FeedbackModal from "./components/FeedbackModal";
 import { useTranslation } from "./lib/i18n/LanguageContext";
 import { CATEGORIES, STYLES } from "./lib/styles";
 import { getTotalAvailableCredits } from "./lib/pricing";
@@ -17,6 +18,7 @@ export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, loginWithGoogle, logout, loading } = useAuth();
   const { canInstall, triggerInstall, showIOSGuide, setShowIOSGuide } = useInstallApp();
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
   useEffect(() => {
     setCurrentCredits(getTotalAvailableCredits());
@@ -607,6 +609,13 @@ export default function Home() {
             <span className="font-bold text-slate-700 font-outfit">Monopic</span>
           </div>
           <div className="flex items-center gap-6 text-xs text-slate-400 font-medium">
+            <button
+              onClick={() => setIsFeedbackOpen(true)}
+              className="hover:text-indigo-600 transition-colors flex items-center gap-1.5"
+            >
+              <span>💬</span>
+              {t("feedback_footer_btn" as keyof typeof import("./lib/i18n/translations").translations.ko) || "문의 / 버그 제보"}
+            </button>
             <Link href="/privacy" className="hover:text-indigo-600 transition-colors">
               개인정보처리방침 (Privacy Policy)
             </Link>
@@ -614,6 +623,9 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Feedback Modal */}
+      <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
 
     </div>
   );

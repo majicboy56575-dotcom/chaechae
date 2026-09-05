@@ -71,7 +71,7 @@ export function getPlan(id: string): PricingPlan | undefined {
 
 // ─── Daily Free Generations Event Configuration ─────────────────
 // Set to false to instantly turn off the daily free event without breaking anything.
-export const ENABLE_DAILY_FREE_EVENT = true;
+export const ENABLE_DAILY_FREE_EVENT = false;
 export const DAILY_FREE_LIMIT = 2;
 
 function getTodayKey(): string {
