@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import { LanguageProvider } from "./lib/i18n/LanguageContext";
 import { AuthProvider } from "./lib/auth/AuthContext";
+import InstallAppBanner from "./components/InstallAppBanner";
 
 const notoSansKr = Noto_Sans_KR({
   subsets: ["latin"],
@@ -31,6 +32,13 @@ export default function RootLayout({
   return (
     <html lang="th">
       <head>
+        {/* PWA Manifest & Icons */}
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Monopic" />
+        <meta name="theme-color" content="#4f46e5" />
         {/* Meta Pixel Code */}
         <Script
           id="meta-pixel"
@@ -64,7 +72,10 @@ export default function RootLayout({
         className={`${notoSansKr.variable} ${outfit.variable} font-sans antialiased`}
       >
         <LanguageProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            {children}
+            <InstallAppBanner />
+          </AuthProvider>
         </LanguageProvider>
       </body>
     </html>

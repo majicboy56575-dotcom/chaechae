@@ -210,6 +210,18 @@ export const translations = {
     modal_success_title: "크레딧 충전이 완료되었습니다!",
     modal_go_generate: "📸 지금 사진 만들러 가기",
     modal_close: "닫기",
+
+    // PWA Install Banner
+    install_banner_desc: "홈 화면에 앱을 설치하세요",
+    install_btn: "설치",
+    install_ios_title: "홈 화면에 앱 추가하기",
+    install_ios_step1: "하단의 공유 버튼을 탭하세요",
+    install_ios_step1_desc: "Safari 하단 바에 있는 공유(⎋) 아이콘을 눌러주세요.",
+    install_ios_step2: "'홈 화면에 추가'를 선택하세요",
+    install_ios_step2_desc: "아래로 스크롤하여 '홈 화면에 추가' 항목을 찾아 탭하세요.",
+    install_ios_step3: "'추가' 버튼을 탭하세요",
+    install_ios_step3_desc: "우측 상단의 '추가'를 눌러 설치를 완료합니다.",
+    install_ios_share_hint: "하단 공유(⎋) 버튼을 먼저 눌러주세요",
   },
   en: {
     // Navigation
@@ -401,6 +413,18 @@ export const translations = {
     modal_success_title: "Credits Successfully Recharged!",
     modal_go_generate: "📸 Generate Photos Now",
     modal_close: "Close",
+
+    // PWA Install Banner
+    install_banner_desc: "Install Monopic on your phone",
+    install_btn: "Install",
+    install_ios_title: "Add to Home Screen",
+    install_ios_step1: "Tap the Share button below",
+    install_ios_step1_desc: "Tap the share (⎋) icon at the bottom of Safari.",
+    install_ios_step2: "Select 'Add to Home Screen'",
+    install_ios_step2_desc: "Scroll down and tap 'Add to Home Screen'.",
+    install_ios_step3: "Tap 'Add'",
+    install_ios_step3_desc: "Tap 'Add' in the top-right corner to finish.",
+    install_ios_share_hint: "Tap the share (⎋) button first",
   },
   th: {
     // Navigation
@@ -592,6 +616,18 @@ export const translations = {
     modal_success_title: "เติมเครดิตเรียบร้อยแล้ว!",
     modal_go_generate: "📸 ไปสร้างรูปภาพเลย",
     modal_close: "ปิด",
+
+    // PWA Install Banner
+    install_banner_desc: "ติดตั้ง Monopic บนมือถือ",
+    install_btn: "ติดตั้ง",
+    install_ios_title: "เพิ่มลงในหน้าจอหลัก",
+    install_ios_step1: "แตะปุ่มแชร์ด้านล่าง",
+    install_ios_step1_desc: "แตะไอคอนแชร์ (⎋) ที่แถบด้านล่างของ Safari",
+    install_ios_step2: "เลือก 'เพิ่มลงในหน้าจอหลัก'",
+    install_ios_step2_desc: "เลื่อนลงแล้วแตะ 'เพิ่มลงในหน้าจอหลัก'",
+    install_ios_step3: "แตะ 'เพิ่ม'",
+    install_ios_step3_desc: "แตะ 'เพิ่ม' ที่มุมขวาบนเพื่อเสร็จสิ้น",
+    install_ios_share_hint: "แตะปุ่มแชร์ (⎋) ก่อน",
   },
   vi: {
     // Navigation
@@ -783,6 +819,18 @@ export const translations = {
     modal_success_title: "Đã nạp thêm lượt thành công!",
     modal_go_generate: "📸 Đi tạo ảnh ngay",
     modal_close: "Đóng",
+
+    // PWA Install Banner
+    install_banner_desc: "Cài đặt Monopic trên điện thoại",
+    install_btn: "Cài đặt",
+    install_ios_title: "Thêm vào Màn hình chính",
+    install_ios_step1: "Nhấn nút Chia sẻ bên dưới",
+    install_ios_step1_desc: "Nhấn biểu tượng chia sẻ (⎋) ở thanh dưới Safari.",
+    install_ios_step2: "Chọn 'Thêm vào Màn hình chính'",
+    install_ios_step2_desc: "Cuộn xuống và nhấn 'Thêm vào Màn hình chính'.",
+    install_ios_step3: "Nhấn 'Thêm'",
+    install_ios_step3_desc: "Nhấn 'Thêm' ở góc trên bên phải để hoàn tất.",
+    install_ios_share_hint: "Nhấn nút chia sẻ (⎋) trước",
   },
   id: {
     // Navigation
@@ -974,6 +1022,18 @@ export const translations = {
     modal_success_title: "Kredit Berhasil Ditambahkan!",
     modal_go_generate: "📸 Buat Foto Sekarang",
     modal_close: "Tutup",
+
+    // PWA Install Banner
+    install_banner_desc: "Instal Monopic di ponsel Anda",
+    install_btn: "Instal",
+    install_ios_title: "Tambahkan ke Layar Utama",
+    install_ios_step1: "Ketuk tombol Bagikan di bawah",
+    install_ios_step1_desc: "Ketuk ikon bagikan (⎋) di bilah bawah Safari.",
+    install_ios_step2: "Pilih 'Tambahkan ke Layar Utama'",
+    install_ios_step2_desc: "Gulir ke bawah dan ketuk 'Tambahkan ke Layar Utama'.",
+    install_ios_step3: "Ketuk 'Tambah'",
+    install_ios_step3_desc: "Ketuk 'Tambah' di pojok kanan atas untuk menyelesaikan.",
+    install_ios_share_hint: "Ketuk tombol bagikan (⎋) terlebih dahulu",
   },
   bn: {
     // Navigation
@@ -1165,6 +1225,18 @@ export const translations = {
     modal_success_title: "ক্রেডিট সফলভাবে যোগ করা হয়েছে!",
     modal_go_generate: "📸 এখনই ছবি তৈরি করুন",
     modal_close: "বন্ধ করুন",
+
+    // PWA Install Banner
+    install_banner_desc: "আপনার ফোনে Monopic ইনস্টল করুন",
+    install_btn: "ইনস্টল",
+    install_ios_title: "হোম স্ক্রিনে যোগ করুন",
+    install_ios_step1: "নিচের শেয়ার বাটনে ট্যাপ করুন",
+    install_ios_step1_desc: "Safari-এর নিচের বারে শেয়ার (⎋) আইকনে ট্যাপ করুন।",
+    install_ios_step2: "'হোম স্ক্রিনে যোগ করুন' নির্বাচন করুন",
+    install_ios_step2_desc: "নিচে স্ক্রল করে 'হোম স্ক্রিনে যোগ করুন' ট্যাপ করুন।",
+    install_ios_step3: "'যোগ করুন' ট্যাপ করুন",
+    install_ios_step3_desc: "উপরের ডান কোণায় 'যোগ করুন' ট্যাপ করে শেষ করুন।",
+    install_ios_share_hint: "প্রথমে শেয়ার (⎋) বাটনে ট্যাপ করুন",
   },
   ms: {
     // Navigation
@@ -1356,6 +1428,18 @@ export const translations = {
     modal_success_title: "Kredit Berjaya Ditambah!",
     modal_go_generate: "📸 Hasilkan Foto Sekarang",
     modal_close: "Tutup",
+
+    // PWA Install Banner
+    install_banner_desc: "Monopic dipasang di telefon anda",
+    install_btn: "Pasang",
+    install_ios_title: "Tambah ke Skrin Utama",
+    install_ios_step1: "Ketik butang Kongsi di bawah",
+    install_ios_step1_desc: "Ketik ikon kongsi (⎋) di bar bawah Safari.",
+    install_ios_step2: "Pilih 'Tambah ke Skrin Utama'",
+    install_ios_step2_desc: "Tatal ke bawah dan ketik 'Tambah ke Skrin Utama'.",
+    install_ios_step3: "Ketik 'Tambah'",
+    install_ios_step3_desc: "Ketik 'Tambah' di penjuru kanan atas untuk selesai.",
+    install_ios_share_hint: "Ketik butang kongsi (⎋) dahulu",
   },
   hi: {
     // Navigation
@@ -1547,5 +1631,17 @@ export const translations = {
     modal_success_title: "क्रेडिट सफलतापूर्वक जुड़ गए हैं!",
     modal_go_generate: "📸 अभी फोटो बनाएं",
     modal_close: "बंद करें",
+
+    // PWA Install Banner
+    install_banner_desc: "Monopic को अपने फोन में इंस्टॉल करें",
+    install_btn: "इंस्टॉल",
+    install_ios_title: "होम स्क्रीन पर जोड़ें",
+    install_ios_step1: "नीचे शेयर बटन पर टैप करें",
+    install_ios_step1_desc: "Safari के नीचे बार में शेयर (⎋) आइकन पर टैप करें।",
+    install_ios_step2: "'होम स्क्रीन पर जोड़ें' चुनें",
+    install_ios_step2_desc: "नीचे स्क्रॉल करें और 'होम स्क्रीन पर जोड़ें' पर टैप करें।",
+    install_ios_step3: "'जोड़ें' पर टैप करें",
+    install_ios_step3_desc: "ऊपर दाएं कोने में 'जोड़ें' टैप करके पूरा करें।",
+    install_ios_share_hint: "पहले शेयर (⎋) बटन पर टैप करें",
   },
 };
