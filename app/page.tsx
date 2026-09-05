@@ -9,12 +9,14 @@ import { useTranslation } from "./lib/i18n/LanguageContext";
 import { CATEGORIES, STYLES } from "./lib/styles";
 import { getTotalAvailableCredits } from "./lib/pricing";
 import { useAuth } from "./lib/auth/AuthContext";
+import { useInstallApp } from "./lib/useInstallApp";
 
 export default function Home() {
   const { t } = useTranslation();
   const [currentCredits, setCurrentCredits] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, loginWithGoogle, logout, loading } = useAuth();
+  const { canInstall, triggerInstall, showIOSGuide, setShowIOSGuide } = useInstallApp();
 
   useEffect(() => {
     setCurrentCredits(getTotalAvailableCredits());
@@ -61,6 +63,14 @@ export default function Home() {
             <Link href="/pricing" className="hover:text-indigo-600 transition-colors flex items-center gap-1 font-bold text-indigo-600">
               <span>💳</span> {t("nav_pricing")}
             </Link>
+            {canInstall && (
+              <button
+                onClick={triggerInstall}
+                className="hover:text-indigo-600 transition-colors flex items-center gap-1"
+              >
+                <span>📲</span> {t("install_btn")}
+              </button>
+            )}
           </nav>
           <div className="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
             <LanguageSelector />
@@ -174,6 +184,17 @@ export default function Home() {
               >
                 <span>💳</span> {t("nav_pricing")}
               </Link>
+              {canInstall && (
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    triggerInstall();
+                  }}
+                  className="hover:text-indigo-600 transition-colors py-2 border-b border-slate-50 flex items-center gap-1.5 text-left"
+                >
+                  <span>📲</span> {t("install_btn")}
+                </button>
+              )}
             </nav>
 
             <div className="h-px bg-slate-100 my-1" />
@@ -240,6 +261,62 @@ export default function Home() {
           </div>
         )}
       </header>
+
+      {/* iOS Install Guide Modal */}
+      {showIOSGuide && (
+        <div
+          className="fixed inset-0 z-[10000] flex items-end justify-center bg-black/40 backdrop-blur-sm animate-fade-in"
+          onClick={() => setShowIOSGuide(false)}
+        >
+          <div
+            className="w-full max-w-md bg-white rounded-t-3xl p-6 pb-10 animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-lg font-bold text-slate-900">
+                {t("install_ios_title")}
+              </h3>
+              <button
+                onClick={() => setShowIOSGuide(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="flex items-start gap-3 mb-4">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-bold">1</div>
+              <div>
+                <p className="text-sm font-semibold text-slate-800">{t("install_ios_step1")}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{t("install_ios_step1_desc")}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 mb-4">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-bold">2</div>
+              <div>
+                <p className="text-sm font-semibold text-slate-800">{t("install_ios_step2")}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{t("install_ios_step2_desc")}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-bold">3</div>
+              <div>
+                <p className="text-sm font-semibold text-slate-800">{t("install_ios_step3")}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{t("install_ios_step3_desc")}</p>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-center">
+              <div className="px-5 py-2.5 rounded-xl bg-slate-100 flex items-center gap-2 text-sm text-slate-600 animate-bounce-gentle">
+                <svg className="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15" />
+                </svg>
+                <span className="font-medium">{t("install_ios_share_hint")}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hero Section */}
       <section className="relative pt-20 pb-12 md:pt-32 md:pb-20 px-6 max-w-7xl mx-auto text-center">
