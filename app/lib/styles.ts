@@ -137,7 +137,7 @@ export const STYLES: StyleDef[] = [
     description: "K-pop 데뷔조 비주얼",
     emoji: "🌟",
     prompt:
-      "Transform into a K-pop idol debut profile photo: flawless dewy idol-style skin, trendy stylish stage outfit, dreamy pastel studio background with soft glowing lighting, magazine-quality retouching.",
+      "Transform into a stunning K-pop idol visual debut portrait: flawless radiant Korean glass skin, sparkling idol-stage eye makeup with subtle glitter and soft pink lips, glamorous hairstyle, chic stylish idol outfit with refined accessories, dreamy pastel bokeh studio backdrop with soft glowing cinematic lighting, ultra-high definition beauty retouching.",
   },
   {
     id: "kdrama",
