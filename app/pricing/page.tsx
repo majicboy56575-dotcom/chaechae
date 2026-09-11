@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { PRICING_PLANS, type PricingPlan, getTotalAvailableCredits } from "../lib/pricing";
+import { PRICING_PLANS, type PricingPlan, getTotalAvailableCredits, addLocalCredits } from "../lib/pricing";
 import PayPalButton from "../components/PayPalButton";
 import LanguageSelector from "../components/LanguageSelector";
 import { useTranslation } from "../lib/i18n/LanguageContext";
@@ -14,6 +14,8 @@ export default function PricingPage() {
   const [selectedPlan, setSelectedPlan] = useState<PricingPlan>(PRICING_PLANS[1]); // Default to Standard (10장)
   const [currentCredits, setCurrentCredits] = useState<number>(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLemonLoading, setIsLemonLoading] = useState(false);
+  const [lemonError, setLemonError] = useState<string | null>(null);
   const [completedOrder, setCompletedOrder] = useState<{
     orderId: string;
     plan: PricingPlan;
@@ -23,6 +25,26 @@ export default function PricingPage() {
     setCurrentCredits(getTotalAvailableCredits());
     const handleUpdate = () => setCurrentCredits(getTotalAvailableCredits());
     window.addEventListener("chae_chae_credits_updated", handleUpdate);
+
+    // Handle return from LemonSqueezy Checkout
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("payment_success") === "true") {
+        const creditsToAdd = parseInt(params.get("credits") || "0", 10);
+        const planId = params.get("plan");
+        const matchedPlan = PRICING_PLANS.find((p) => p.id === planId) || PRICING_PLANS[1];
+        if (creditsToAdd > 0) {
+          addLocalCredits(creditsToAdd);
+          setCompletedOrder({
+            orderId: `LS-${Date.now().toString(36).toUpperCase()}`,
+            plan: matchedPlan,
+          });
+          setCurrentCredits(getTotalAvailableCredits());
+        }
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+
     return () => window.removeEventListener("chae_chae_credits_updated", handleUpdate);
   }, []);
 
@@ -468,9 +490,88 @@ export default function PricingPage() {
                   결제 완료 시 <span className="font-bold text-indigo-700">{user.displayName || user.email}</span> 계정으로 즉시 크레딧이 충전됩니다.
                 </div>
               </div>
+
+              {lemonError && (
+                <div className="mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-600 text-xs font-bold rounded-xl text-center">
+                  {lemonError}
+                </div>
+              )}
+
+              {/* Primary Payment: LemonSqueezy (Cards, Apple Pay, Google Pay) */}
+              <div className="mb-5">
+                <button
+                  onClick={async () => {
+                    if (!user) {
+                      loginWithGoogle();
+                      return;
+                    }
+                    setIsLemonLoading(true);
+                    setLemonError(null);
+                    try {
+                      const res = await fetch("/api/lemonsqueezy/checkout", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          variantId: selectedPlan.lemonVariantId,
+                          planId: selectedPlan.id,
+                          credits: selectedPlan.count,
+                          userId: user.uid,
+                          userEmail: user.email,
+                        }),
+                      });
+                      const data = await res.json();
+                      if (data.checkoutUrl) {
+                        window.location.href = data.checkoutUrl;
+                      } else {
+                        throw new Error(data.error || "Failed to create checkout URL");
+                      }
+                    } catch (err: unknown) {
+                      console.error("LemonSqueezy Checkout Error:", err);
+                      const msg = err instanceof Error ? err.message : "Error initiating checkout.";
+                      setLemonError(msg);
+                      setIsLemonLoading(false);
+                    }
+                  }}
+                  disabled={isLemonLoading}
+                  className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-indigo-600/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 disabled:opacity-75 cursor-pointer"
+                >
+                  {isLemonLoading ? (
+                    <>
+                      <div className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                      <span>결제창 연결 중...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>💳</span>
+                      <span>신용/체크카드 · Apple Pay · Google Pay 결제 ({selectedPlan.priceStr})</span>
+                    </>
+                  )}
+                </button>
+
+                <div className="flex items-center justify-center gap-3 mt-3 text-[11px] text-slate-500 font-bold">
+                  <span className="flex items-center gap-1">🔒 256-bit 보안 결제</span>
+                  <span>•</span>
+                  <span>⚡ 결제 즉시 자동 적립</span>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-100"></div>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-3 text-slate-400 font-bold">
+                    또는 (OR)
+                  </span>
+                </div>
+              </div>
+
+              {/* Secondary Payment: PayPal */}
               <div className="mb-4">
-                <p className="text-xs text-slate-500 font-bold mb-3 text-center">
-                  {t("pricing_paypal_guide")}
+                <p className="text-xs text-slate-500 font-bold mb-2.5 text-center flex items-center justify-center gap-1.5">
+                  <span>🅿️</span>
+                  <span>PayPal 계정으로 결제하기</span>
                 </p>
                 <PayPalButton
                   plan={selectedPlan}
