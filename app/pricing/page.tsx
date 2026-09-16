@@ -7,6 +7,7 @@ import PayPalButton from "../components/PayPalButton";
 import LanguageSelector from "../components/LanguageSelector";
 import { useTranslation } from "../lib/i18n/LanguageContext";
 import { useAuth } from "../lib/auth/AuthContext";
+import { initializePaddle, type Paddle } from "@paddle/paddle-js";
 
 export default function PricingPage() {
   const { t } = useTranslation();
@@ -14,8 +15,9 @@ export default function PricingPage() {
   const [selectedPlan, setSelectedPlan] = useState<PricingPlan>(PRICING_PLANS[1]); // Default to Standard (10장)
   const [currentCredits, setCurrentCredits] = useState<number>(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLemonLoading, setIsLemonLoading] = useState(false);
-  const [lemonError, setLemonError] = useState<string | null>(null);
+  const [paddle, setPaddle] = useState<Paddle | null>(null);
+  const [isPaddleLoading, setIsPaddleLoading] = useState(false);
+  const [paddleError, setPaddleError] = useState<string | null>(null);
   const [completedOrder, setCompletedOrder] = useState<{
     orderId: string;
     plan: PricingPlan;
@@ -26,7 +28,33 @@ export default function PricingPage() {
     const handleUpdate = () => setCurrentCredits(getTotalAvailableCredits());
     window.addEventListener("chae_chae_credits_updated", handleUpdate);
 
-    // Handle return from LemonSqueezy Checkout
+    // Initialize Paddle.js
+    const clientToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN || "live_f08c71ae23ea8793b09ab195144";
+    initializePaddle({
+      environment: "production",
+      token: clientToken,
+      eventCallback: (event) => {
+        if (event.name === "checkout.completed") {
+          const eventData = event.data as Record<string, unknown> | undefined;
+          const customData = eventData?.custom_data as Record<string, string> | undefined;
+          const creditsToAdd = customData?.credits ? parseInt(customData.credits, 10) : selectedPlan.count;
+          addLocalCredits(creditsToAdd);
+          setCompletedOrder({
+            orderId: (eventData?.id as string) || `PD-${Date.now().toString(36).toUpperCase()}`,
+            plan: selectedPlan,
+          });
+          setCurrentCredits(getTotalAvailableCredits());
+        }
+      },
+    })
+      .then((paddleInstance) => {
+        if (paddleInstance) setPaddle(paddleInstance);
+      })
+      .catch((err) => {
+        console.error("Paddle init error:", err);
+      });
+
+    // Handle return from Paddle checkout redirect (fallback)
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       if (params.get("payment_success") === "true") {
@@ -36,7 +64,7 @@ export default function PricingPage() {
         if (creditsToAdd > 0) {
           addLocalCredits(creditsToAdd);
           setCompletedOrder({
-            orderId: `LS-${Date.now().toString(36).toUpperCase()}`,
+            orderId: `PD-${Date.now().toString(36).toUpperCase()}`,
             plan: matchedPlan,
           });
           setCurrentCredits(getTotalAvailableCredits());
@@ -46,11 +74,66 @@ export default function PricingPage() {
     }
 
     return () => window.removeEventListener("chae_chae_credits_updated", handleUpdate);
-  }, []);
+  }, [selectedPlan]);
 
   const handlePaymentSuccess = (orderId: string, plan: PricingPlan) => {
     setCompletedOrder({ orderId, plan });
     setCurrentCredits(getTotalAvailableCredits());
+  };
+
+  const handlePaddleCheckout = () => {
+    if (!user) {
+      loginWithGoogle();
+      return;
+    }
+    if (!selectedPlan.paddlePriceId) {
+      setPaddleError("Price configuration not found.");
+      return;
+    }
+
+    setIsPaddleLoading(true);
+    setPaddleError(null);
+
+    const openCheckout = (instance: Paddle) => {
+      instance.Checkout.open({
+        items: [{ priceId: selectedPlan.paddlePriceId!, quantity: 1 }],
+        customData: {
+          userId: user.uid,
+          credits: String(selectedPlan.count),
+          planId: selectedPlan.id,
+        },
+        customer: user.email ? { email: user.email } : undefined,
+        settings: {
+          displayMode: "overlay",
+          theme: "light",
+          locale: "en",
+          successUrl: `${window.location.origin}/pricing?payment_success=true&provider=paddle&credits=${selectedPlan.count}&plan=${selectedPlan.id}`,
+        },
+      });
+      setIsPaddleLoading(false);
+    };
+
+    if (paddle) {
+      openCheckout(paddle);
+    } else {
+      const clientToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN || "live_f08c71ae23ea8793b09ab195144";
+      initializePaddle({
+        environment: "production",
+        token: clientToken,
+      })
+        .then((p) => {
+          if (p) {
+            setPaddle(p);
+            openCheckout(p);
+          } else {
+            throw new Error("Failed to load Paddle");
+          }
+        })
+        .catch((err) => {
+          setPaddleError(err?.message || "Failed to open checkout");
+          setIsPaddleLoading(false);
+        });
+    }
   };
 
   const getPlanName = (plan: PricingPlan) => {
@@ -491,51 +574,20 @@ export default function PricingPage() {
                 </div>
               </div>
 
-              {lemonError && (
+              {paddleError && (
                 <div className="mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-600 text-xs font-bold rounded-xl text-center">
-                  {lemonError}
+                  {paddleError}
                 </div>
               )}
 
-              {/* Primary Payment: LemonSqueezy (Cards, Apple Pay, Google Pay) */}
+              {/* Primary Payment: Paddle (Cards, Apple Pay, Google Pay, iDEAL, PayPal) */}
               <div className="mb-5">
                 <button
-                  onClick={async () => {
-                    if (!user) {
-                      loginWithGoogle();
-                      return;
-                    }
-                    setIsLemonLoading(true);
-                    setLemonError(null);
-                    try {
-                      const res = await fetch("/api/lemonsqueezy/checkout", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          variantId: selectedPlan.lemonVariantId,
-                          planId: selectedPlan.id,
-                          credits: selectedPlan.count,
-                          userId: user.uid,
-                          userEmail: user.email,
-                        }),
-                      });
-                      const data = await res.json();
-                      if (data.checkoutUrl) {
-                        window.location.href = data.checkoutUrl;
-                      } else {
-                        throw new Error(data.error || "Failed to create checkout URL");
-                      }
-                    } catch (err: unknown) {
-                      console.error("LemonSqueezy Checkout Error:", err);
-                      const msg = err instanceof Error ? err.message : "Error initiating checkout.";
-                      setLemonError(msg);
-                      setIsLemonLoading(false);
-                    }
-                  }}
-                  disabled={isLemonLoading}
+                  onClick={handlePaddleCheckout}
+                  disabled={isPaddleLoading}
                   className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-indigo-600/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 disabled:opacity-75 cursor-pointer"
                 >
-                  {isLemonLoading ? (
+                  {isPaddleLoading ? (
                     <>
                       <div className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
                       <span>결제창 연결 중...</span>
@@ -668,21 +720,40 @@ export default function PricingPage() {
               </div>
             ))}
           </div>
+
+          {/* Trust Guarantees */}
+          <div className="mt-8 pt-6 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+            <div className="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100 flex items-start gap-2.5">
+              <span className="text-base">🛡️</span>
+              <div>
+                <h5 className="font-bold text-xs text-emerald-950">14일 안심 환불 보장</h5>
+                <p className="text-[11px] text-emerald-800 leading-tight mt-0.5">
+                  미사용 크레딧은 14일 이내 100% 무조건 전액 환불 (<Link href="/refund" className="underline font-bold">환불정책</Link>)
+                </p>
+              </div>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-100 flex items-start gap-2.5">
+              <span className="text-base">⚡</span>
+              <div>
+                <h5 className="font-bold text-xs text-indigo-950">즉시 디지털 배송</h5>
+                <p className="text-[11px] text-indigo-800 leading-tight mt-0.5">
+                  결제 완료 즉시 크레딧 충전, AI 연산 약 30초 내 실시간 제공
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
 
-      {/* Payment Success Modal */}
+      {/* Success Modal */}
       {completedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl border border-slate-100 p-8 max-w-md w-full shadow-2xl text-center transform scale-100 animate-scale-up">
-            <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 text-3xl flex items-center justify-center mx-auto mb-4 animate-bounce">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center shadow-2xl border border-slate-100 scale-in-95 duration-200">
+            <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl mx-auto mb-4">
               🎉
             </div>
-            <span className="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-wider mb-2 inline-block">
-              {t("modal_success_badge")}
-            </span>
-            <h3 className="text-2xl font-black text-slate-900 tracking-tight mb-2">
-              {t("modal_success_title")}
+            <h3 className="text-xl font-black text-slate-900 mb-2">
+              결제가 완료되었습니다! 🎉
             </h3>
             <p className="text-xs text-slate-500 mb-6 leading-relaxed">
               <strong>{getPlanName(completedOrder.plan)}</strong> ({completedOrder.plan.priceStr})
@@ -710,13 +781,13 @@ export default function PricingPage() {
                 href="/#upload-section"
                 className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 px-6 rounded-xl transition-all text-sm shadow-md active:scale-[0.98] flex items-center justify-center gap-2"
               >
-                <span>{t("modal_go_generate")}</span>
+                <span>사진 생성하러 가기 →</span>
               </Link>
               <button
                 onClick={() => setCompletedOrder(null)}
                 className="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 px-6 rounded-xl transition-all text-xs"
               >
-                {t("modal_close")}
+                닫기
               </button>
             </div>
           </div>
@@ -726,15 +797,31 @@ export default function PricingPage() {
       {/* Footer */}
       <footer className="border-t border-slate-100 bg-white py-12 px-6">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-slate-500">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-700 font-outfit">Monopic</span>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <span className="font-extrabold text-slate-900 font-outfit text-base">Monopic</span>
+            <span className="hidden sm:inline text-slate-300">|</span>
+            <span className="text-xs text-slate-500">AI Portrait & Profile Studio SaaS</span>
           </div>
-          <div className="flex items-center gap-6 text-xs text-slate-400 font-medium">
-            <Link href="/privacy" className="hover:text-indigo-600 transition-colors">
-              개인정보처리방침 (Privacy Policy)
+          <div className="flex flex-wrap items-center justify-center gap-5 text-xs text-slate-500 font-medium">
+            <Link href="/terms" className="hover:text-indigo-600 transition-colors">
+              Terms of Service (이용약관)
             </Link>
-            <p>© 2026 Monopic. All rights reserved.</p>
+            <Link href="/privacy" className="hover:text-indigo-600 transition-colors">
+              Privacy Policy (개인정보처리방침)
+            </Link>
+            <Link href="/refund" className="hover:text-indigo-600 transition-colors">
+              Refund Policy (환불정책)
+            </Link>
+            <Link href="/pricing" className="hover:text-indigo-600 transition-colors">
+              Pricing (요금제)
+            </Link>
           </div>
+        </div>
+        <div className="max-w-7xl mx-auto mt-6 pt-6 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-2 text-[11px] text-slate-400">
+          <p>
+            Monopic · 대표: 박윤우 (Yunwoo Park) · 소재지: 대전광역시 유성구 전민로38번길 56 · Support: <a href="mailto:majicboy56575@gmail.com" className="text-indigo-600 font-semibold hover:underline">majicboy56575@gmail.com</a>
+          </p>
+          <p>© 2026 Monopic. All rights reserved.</p>
         </div>
       </footer>
     </div>

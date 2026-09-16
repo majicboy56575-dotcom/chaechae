@@ -8,7 +8,7 @@ import LanguageSelector from "./components/LanguageSelector";
 import FeedbackModal from "./components/FeedbackModal";
 import { useTranslation } from "./lib/i18n/LanguageContext";
 import { CATEGORIES, STYLES } from "./lib/styles";
-import { getTotalAvailableCredits } from "./lib/pricing";
+import { getTotalAvailableCredits, PRICING_PLANS } from "./lib/pricing";
 import { useAuth } from "./lib/auth/AuthContext";
 import { useInstallApp } from "./lib/useInstallApp";
 
@@ -62,9 +62,12 @@ export default function Home() {
             <a href="#showcase" className="hover:text-indigo-600 transition-colors">
               {t("nav_showcase")}
             </a>
-            <Link href="/pricing" className="hover:text-indigo-600 transition-colors flex items-center gap-1 font-bold text-indigo-600">
+            <a href="#pricing" className="hover:text-indigo-600 transition-colors flex items-center gap-1 font-bold text-indigo-600">
               <span>💳</span> {t("nav_pricing")}
-            </Link>
+            </a>
+            <a href="#safety" className="hover:text-indigo-600 transition-colors flex items-center gap-1">
+              <span>🛡️</span> AI 윤리·안전
+            </a>
             {canInstall && (
               <button
                 onClick={triggerInstall}
@@ -179,13 +182,20 @@ export default function Home() {
               >
                 {t("nav_showcase")}
               </a>
-              <Link
-                href="/pricing"
+              <a
+                href="#pricing"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="hover:text-indigo-600 transition-colors py-2 border-b border-slate-50 flex items-center gap-1.5 font-bold text-indigo-600"
               >
                 <span>💳</span> {t("nav_pricing")}
-              </Link>
+              </a>
+              <a
+                href="#safety"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="hover:text-indigo-600 transition-colors py-2 border-b border-slate-50 flex items-center gap-1.5 font-bold text-slate-700"
+              >
+                <span>🛡️</span> AI 윤리·안전
+              </a>
               {canInstall && (
                 <button
                   onClick={() => {
@@ -384,12 +394,12 @@ export default function Home() {
         <div className="relative bg-white/60 backdrop-blur-md rounded-3xl border border-slate-100/80 p-6 sm:p-10 md:p-12 shadow-xl shadow-slate-200/50 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12">
           {/* Before Card */}
           <div className="w-full md:w-5/12 flex flex-col items-center">
-            <div className="relative w-60 h-60 sm:w-68 sm:h-68 rounded-2xl overflow-hidden shadow-md border-4 border-white transform -rotate-2 hover:rotate-0 transition-transform duration-300">
+            <div className="relative w-60 h-60 sm:w-72 sm:h-72 rounded-2xl overflow-hidden shadow-md border-4 border-white transform -rotate-2 hover:rotate-0 transition-transform duration-300">
               <Image
                 src="/images/selfie_before.png"
                 alt="Before Selfie"
                 fill
-                sizes="(max-width: 768px) 240px, 272px"
+                sizes="(max-width: 768px) 240px, 288px"
                 className="object-cover"
                 priority
               />
@@ -413,12 +423,12 @@ export default function Home() {
 
           {/* After Card */}
           <div className="w-full md:w-5/12 flex flex-col items-center">
-            <div className="relative w-60 h-60 sm:w-68 sm:h-68 rounded-2xl overflow-hidden shadow-2xl border-4 border-white transform rotate-2 hover:rotate-0 transition-transform duration-300 ring-4 ring-indigo-500/5">
+            <div className="relative w-60 h-60 sm:w-72 sm:h-72 rounded-2xl overflow-hidden shadow-2xl border-4 border-white transform rotate-2 hover:rotate-0 transition-transform duration-300 ring-4 ring-indigo-500/5">
               <Image
                 src="/images/profile_after.png"
                 alt="After Headshot"
                 fill
-                sizes="(max-width: 768px) 240px, 272px"
+                sizes="(max-width: 768px) 240px, 288px"
                 className="object-cover"
                 priority
               />
@@ -575,6 +585,206 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Pricing Section on Landing Page */}
+      <section id="pricing" className="py-20 px-6 max-w-7xl mx-auto border-t border-slate-100/80 scroll-mt-20">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 mb-3 shadow-sm">
+            <span>💳</span>
+            <span>Transparent Pricing</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
+            합리적인 1회성 요금제 (No Subscription)
+          </h2>
+          <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
+            매달 자동 결제되는 번거로운 구독이 아닙니다. 필요한 수량만 1회 결제하여 원할 때 언제든 평생 사용하세요.
+          </p>
+        </div>
+
+        {/* Pricing Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto mb-10">
+          {PRICING_PLANS.map((plan) => {
+            const isPop = plan.isPopular;
+            return (
+              <div
+                key={plan.id}
+                className={`relative rounded-3xl p-6 sm:p-8 transition-all flex flex-col justify-between ${
+                  isPop
+                    ? "bg-white border-2 border-indigo-600 shadow-xl shadow-indigo-600/10 ring-4 ring-indigo-50 md:-translate-y-2"
+                    : "bg-white border border-slate-200/80 shadow-sm hover:shadow-md"
+                }`}
+              >
+                {plan.discountBadge && (
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-extrabold tracking-wide uppercase bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/20 whitespace-nowrap">
+                    {plan.discountBadge}
+                  </div>
+                )}
+
+                <div>
+                  <div className="flex items-center justify-between mb-4 mt-1">
+                    <h3 className="font-extrabold text-lg text-slate-900 font-outfit">
+                      {plan.name}
+                    </h3>
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-indigo-50 text-indigo-700">
+                      +{plan.count}장
+                    </span>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight font-outfit">
+                        {plan.priceStr}
+                      </span>
+                      <span className="text-xs text-slate-400 font-medium">/ 1회 결제</span>
+                    </div>
+                    <p className="text-xs font-bold text-emerald-600 mt-1">
+                      장당 {plan.perPhoto}
+                    </p>
+                  </div>
+
+                  <p className="text-xs text-slate-500 leading-relaxed mb-6">
+                    {plan.description}
+                  </p>
+
+                  <div className="space-y-2.5 mb-8 pt-4 border-t border-slate-100 text-xs text-slate-600">
+                    {plan.features.map((feat, idx) => (
+                      <div key={idx} className="flex items-start gap-2">
+                        <span className="text-emerald-500 font-bold flex-shrink-0">✓</span>
+                        <span>{feat}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <Link
+                  href={`/pricing?plan=${plan.id}`}
+                  className={`w-full py-3.5 px-4 rounded-2xl font-bold text-sm text-center transition-all shadow-md flex items-center justify-center gap-1.5 active:scale-[0.98] ${
+                    isPop
+                      ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/20"
+                      : "bg-slate-900 hover:bg-slate-800 text-white"
+                  }`}
+                >
+                  <span>충전하기</span>
+                  <span>→</span>
+                </Link>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Guarantees on Landing Page */}
+        <div className="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
+          <div className="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100 flex items-center gap-2.5">
+            <span className="text-lg">🛡️</span>
+            <div>
+              <h5 className="font-bold text-xs text-emerald-950">14일 안심 환불 보장</h5>
+              <p className="text-[10.5px] text-emerald-800 leading-tight mt-0.5">
+                미사용 크레딧 100% 무조건 환불
+              </p>
+            </div>
+          </div>
+          <div className="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-100 flex items-center gap-2.5">
+            <span className="text-lg">⚡</span>
+            <div>
+              <h5 className="font-bold text-xs text-indigo-950">즉시 디지털 배송</h5>
+              <p className="text-[10.5px] text-indigo-800 leading-tight mt-0.5">
+                AI 연산 약 30초 내 실시간 제공
+              </p>
+            </div>
+          </div>
+          <div className="p-3.5 rounded-2xl bg-purple-50/60 border border-purple-100 flex items-center gap-2.5">
+            <span className="text-lg">🔒</span>
+            <div>
+              <h5 className="font-bold text-xs text-purple-950">256-bit 안전 결제</h5>
+              <p className="text-[10.5px] text-purple-800 leading-tight mt-0.5">
+                카드 · Apple/Google Pay 지원
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* AI Ethics, Safety & Privacy Section on Landing Page */}
+      <section id="safety" className="py-20 px-6 max-w-7xl mx-auto border-t border-slate-100/80 scroll-mt-20">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 mb-3 shadow-sm">
+            <span>🛡️</span>
+            <span>AI Ethics & Safety Standards</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
+            안전하고 신뢰할 수 있는 AI 스튜디오
+          </h2>
+          <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
+            Monopic은 건전한 비즈니스 프로필 생성을 위해 엄격한 AI 윤리 규범(AUP)과 글로벌 개인정보 보호 기준을 철저히 준수합니다.
+          </p>
+        </div>
+
+        {/* 4 Core Safety Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-10">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-2xl mb-5">
+              🚫
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">
+              타인 사칭 및 비동의 딥페이크 엄격 금지 (Anti-Deepfake)
+            </h3>
+            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
+              본인 또는 정당한 서면 동의를 얻은 인물의 사진만 업로드할 수 있습니다. 타인을 사칭하거나 기망할 목적의 악의적 얼굴 합성은 엄격히 금지되며, 적발 시 계정이 즉시 영구 정지됩니다.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl mb-5">
+              🔞
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">
+              성인물(NSFW) 및 유해 콘텐츠 원천 차단 (Zero-Tolerance NSFW)
+            </h3>
+            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
+              누드, 음란물, 성적 묘사 및 폭력적·혐오적 이미지 생성 시도는 인공지능 안전 필터링 시스템에 의해 사전 자동 차단됩니다. 미성년자를 대상으로 한 유해 이미지 생성은 절대 불가능합니다.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl mb-5">
+              🔒
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">
+              AI 모델 무단 학습 절대 금지 (Zero AI Training & Instant Purge)
+            </h3>
+            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
+              이용자가 업로드한 원본 사진은 AI 모델 훈련(Training) 데이터셋으로 절대 수집, 재사용, 판매되지 않습니다. 연산 완료 즉시 서버 메모리에서 안전하게 영구 파기됩니다.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mb-5">
+              💼
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">
+              100% 상업적 이용 권리 보장 (Commercial IP Rights)
+            </h3>
+            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
+              유료 크레딧으로 정상 생성된 모든 고화질 결과물의 소유권은 이용자에게 귀속됩니다. 이력서, 링크드인, 웹사이트, 개인 홍보물 등 상업적/비상업적 목적으로 자유롭게 다운로드하고 활용하실 수 있습니다.
+            </p>
+          </div>
+        </div>
+
+        <div className="text-center">
+          <p className="text-xs text-slate-400 mb-3">
+            더 자세한 정책 규정은 공식 법적 문서를 확인해 주세요:
+          </p>
+          <div className="inline-flex items-center gap-4 text-xs font-bold text-indigo-600">
+            <Link href="/terms" className="hover:underline flex items-center gap-1">
+              <span>📜</span> 이용약관 (Terms of Service) →
+            </Link>
+            <span className="text-slate-300">|</span>
+            <Link href="/privacy" className="hover:underline flex items-center gap-1">
+              <span>🔒</span> 개인정보처리방침 (Privacy Policy) →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Bottom CTA Section */}
       <section className="py-16 px-6 max-w-5xl mx-auto">
         <div className="relative bg-gradient-to-tr from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-8 md:p-16 text-center shadow-2xl overflow-hidden">
@@ -605,22 +815,38 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-slate-100 bg-white py-12 px-6">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-slate-500">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-700 font-outfit">Monopic</span>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <span className="font-extrabold text-slate-900 font-outfit text-base">Monopic</span>
+            <span className="hidden sm:inline text-slate-300">|</span>
+            <span className="text-xs text-slate-500">AI Portrait & Profile Studio SaaS</span>
           </div>
-          <div className="flex items-center gap-6 text-xs text-slate-400 font-medium">
+          <div className="flex flex-wrap items-center justify-center gap-5 text-xs text-slate-500 font-medium">
+            <Link href="/terms" className="hover:text-indigo-600 transition-colors">
+              Terms of Service (이용약관)
+            </Link>
+            <Link href="/privacy" className="hover:text-indigo-600 transition-colors">
+              Privacy Policy (개인정보처리방침)
+            </Link>
+            <Link href="/refund" className="hover:text-indigo-600 transition-colors">
+              Refund Policy (환불정책)
+            </Link>
+            <Link href="/pricing" className="hover:text-indigo-600 transition-colors">
+              Pricing (요금제)
+            </Link>
             <button
               onClick={() => setIsFeedbackOpen(true)}
-              className="hover:text-indigo-600 transition-colors flex items-center gap-1.5"
+              className="hover:text-indigo-600 transition-colors flex items-center gap-1"
             >
               <span>💬</span>
-              {t("feedback_footer_btn" as keyof typeof import("./lib/i18n/translations").translations.ko) || "문의 / 버그 제보"}
+              {t("feedback_footer_btn" as keyof typeof import("./lib/i18n/translations").translations.ko) || "문의 / 지원"}
             </button>
-            <Link href="/privacy" className="hover:text-indigo-600 transition-colors">
-              개인정보처리방침 (Privacy Policy)
-            </Link>
-            <p>© 2026 Monopic. All rights reserved.</p>
           </div>
+        </div>
+        <div className="max-w-7xl mx-auto mt-6 pt-6 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-2 text-[11px] text-slate-400">
+          <p>
+            Monopic · 대표: 박윤우 (Yunwoo Park) · 소재지: 대전광역시 유성구 전민로38번길 56 · Support: <a href="mailto:majicboy56575@gmail.com" className="text-indigo-600 font-semibold hover:underline">majicboy56575@gmail.com</a>
+          </p>
+          <p>© 2026 Monopic. All rights reserved.</p>
         </div>
       </footer>
 

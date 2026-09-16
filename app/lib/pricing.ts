@@ -9,7 +9,7 @@ export interface PricingPlan {
   discountBadge?: string;
   description: string;
   features: string[];
-  lemonVariantId?: string;
+  paddlePriceId?: string;
 }
 
 export const PRICING_PLANS: PricingPlan[] = [
@@ -20,7 +20,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     price: 3.99,
     priceStr: "$3.99",
     perPhoto: "$0.80",
-    lemonVariantId: "2114391",
+    paddlePriceId: "pri_01m2javmd907cd11y1abqyp4e4",
     description: "이력서 & 증명사진을 빠르게 준비하는 기본 패키지",
     features: [
       "AI 고해상도 생성 5장",
@@ -37,7 +37,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     price: 6.99,
     priceStr: "$6.99",
     perPhoto: "$0.70",
-    lemonVariantId: "2114393",
+    paddlePriceId: "pri_01m2jaz2zd7zgdbdrtybv11cp5",
     isPopular: true,
     discountBadge: "12% 할인 · 가장 인기",
     description: "비즈니스 정장부터 감성 화보까지 다양한 컨셉 추천",
@@ -56,7 +56,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     price: 10.99,
     priceStr: "$10.99",
     perPhoto: "$0.55",
-    lemonVariantId: "2114395",
+    paddlePriceId: "pri_01m2jazxj71pvf6mnj79s8crb1",
     discountBadge: "31% 최대 절약",
     description: "전문 스튜디오급 풀 패키지 & 넉넉한 대량 생성",
     features: [
