@@ -133,6 +133,19 @@ export default function TermsPage() {
               <li><strong>14일 환불 보장</strong>: 구매 후 14일 이내이며 크레딧을 사용하지 않은 경우 100% 전액 환불이 가능합니다.</li>
               <li><strong>AI 연산 실패 보증</strong>: 기술적 오류나 서버 장애로 인해 생성이 실패한 경우 크레딧이 차감되지 않으며, 고객 요청 시 즉시 무상 재충전 또는 환불을 지원합니다.</li>
             </ul>
+
+            {/* Quality Assurance & Satisfaction Guarantee — Critical for MoR compliance */}
+            <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border border-amber-200/80 p-4 rounded-2xl mt-4 text-xs sm:text-sm text-amber-950">
+              <p className="font-bold mb-2 text-base">✨ Quality Assurance & 100% Satisfaction Guarantee</p>
+              <p className="leading-relaxed mb-2">
+                Monopic is committed to ensuring every customer is fully satisfied with their AI-generated results. To eliminate the need for payment disputes (chargebacks), the following in-app satisfaction measures are provided:
+              </p>
+              <ul className="list-disc list-inside space-y-1.5 pl-2">
+                <li><strong>1-Click Free Regeneration</strong>: If the AI-generated result does not meet the customer&apos;s expectations, a one-time free regeneration is available at no additional credit cost. This allows the customer to immediately obtain an improved result without financial loss.</li>
+                <li><strong>In-App Instant Dispute Resolution</strong>: Customers can submit feedback or complaints directly within the application. All quality-related issues are resolved within 24 hours via credit restoration or full refund.</li>
+                <li><strong>Zero-Dispute Policy</strong>: These built-in safeguards ensure that customers never need to initiate a chargeback with their card issuer. Monopic proactively resolves all dissatisfaction before it escalates to a payment dispute.</li>
+              </ul>
+            </div>
           </section>
 
           {/* 6. 고객 지원 및 분쟁 해결 */}

@@ -672,13 +672,22 @@ export default function Home() {
         </div>
 
         {/* Guarantees on Landing Page */}
-        <div className="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
+        <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
           <div className="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100 flex items-center gap-2.5">
             <span className="text-lg">🛡️</span>
             <div>
               <h5 className="font-bold text-xs text-emerald-950">14일 안심 환불 보장</h5>
               <p className="text-[10.5px] text-emerald-800 leading-tight mt-0.5">
                 미사용 크레딧 100% 무조건 환불
+              </p>
+            </div>
+          </div>
+          <div className="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-100 flex items-center gap-2.5">
+            <span className="text-lg">✨</span>
+            <div>
+              <h5 className="font-bold text-xs text-amber-950">100% Satisfaction Guarantee</h5>
+              <p className="text-[10.5px] text-amber-800 leading-tight mt-0.5">
+                불만족 시 1회 무상 즉시 재생성
               </p>
             </div>
           </div>
@@ -766,6 +775,23 @@ export default function Home() {
             <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
               유료 크레딧으로 정상 생성된 모든 고화질 결과물의 소유권은 이용자에게 귀속됩니다. 이력서, 링크드인, 웹사이트, 개인 홍보물 등 상업적/비상업적 목적으로 자유롭게 다운로드하고 활용하실 수 있습니다.
             </p>
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-amber-200 shadow-sm hover:shadow-md transition-shadow md:col-span-2">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl mb-5">
+              ✨
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">
+              100% 고객 만족 보장 및 분쟁 방지 (Satisfaction Guarantee & Zero-Dispute Policy)
+            </h3>
+            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-3">
+              Monopic은 결과물에 만족하지 않는 고객이 카드사에 결제 분쟁(Chargeback)을 제기할 필요가 전혀 없도록 앱 내에서 즉시 해결하는 시스템을 제공합니다.
+            </p>
+            <ul className="list-disc list-inside space-y-1.5 pl-2 text-xs sm:text-sm text-slate-600">
+              <li><strong>1-Click Free Regeneration</strong>: AI 결과물이 기대에 미치지 못할 경우, 크레딧 차감 없이 1회 무상 즉시 재생성을 제공합니다.</li>
+              <li><strong>In-App Instant Resolution</strong>: 앱 내 피드백 모달을 통해 24시간 이내에 크레딧 복구 또는 전액 환불을 즉시 처리합니다.</li>
+              <li><strong>14-Day Full Refund</strong>: 미사용 크레딧은 구매 후 14일 이내 100% 전액 환불을 무조건 보장합니다.</li>
+            </ul>
           </div>
         </div>
 

@@ -60,6 +60,8 @@ export default function UploadCard() {
   const [printSizeId, setPrintSizeId] = useState<string>(PRINT_SIZES[1].id);
   const [isSheetGenerating, setIsSheetGenerating] = useState(false);
   const [credits, setCredits] = useState<number>(0);
+  const [hasUsedFreeRegen, setHasUsedFreeRegen] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -320,8 +322,44 @@ export default function UploadCard() {
     setFileName(null);
     setError(null);
     setCustomPrompt("");
+    setHasUsedFreeRegen(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
+    }
+  };
+
+  // Free 1-Click Regeneration (Satisfaction Guarantee — no credit deduction)
+  const handleFreeRegenerate = async () => {
+    if (!selfieBase64 || hasUsedFreeRegen) return;
+    setIsRegenerating(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          imageBase64: selfieBase64,
+          styleId: usedStyleId,
+          bgColor,
+          customPrompt: usedStyleId === "custom" ? customPrompt.trim() : undefined,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Regeneration failed.");
+      }
+
+      // No credit deduction for free regeneration
+      setResult({ lite: data.lite });
+      setHasUsedFreeRegen(true);
+    } catch (err: unknown) {
+      console.error(err);
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || "Regeneration failed. Please try again.");
+    } finally {
+      setIsRegenerating(false);
     }
   };
 
@@ -504,6 +542,54 @@ export default function UploadCard() {
             <span>{error}</span>
           </div>
         )}
+
+        {/* Satisfaction Guarantee — Free Regeneration */}
+        {bestResult && !hasUsedFreeRegen && (
+          <div className="mb-6 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border border-amber-200/80 rounded-2xl p-4 sm:p-5">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl flex-shrink-0">✨</span>
+              <div className="flex-1">
+                <h4 className="text-sm font-extrabold text-amber-950 mb-1">
+                  Not satisfied? Free 1-Click Regeneration
+                </h4>
+                <p className="text-[11px] text-amber-800 leading-relaxed mb-3">
+                  We guarantee your satisfaction. If the result doesn&apos;t meet your expectations, regenerate once for free — no credit charged.
+                </p>
+                <button
+                  onClick={handleFreeRegenerate}
+                  disabled={isRegenerating}
+                  className="inline-flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 disabled:bg-amber-300 text-white text-xs font-bold py-2.5 px-5 rounded-xl transition-all shadow-md shadow-amber-600/10 active:scale-[0.98]"
+                >
+                  {isRegenerating ? (
+                    <>
+                      <span className="w-3.5 h-3.5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+                      Regenerating...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      Free Regenerate (0 Credit)
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {hasUsedFreeRegen && (
+          <div className="mb-6 flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 p-3 rounded-xl">
+            <span>✅</span>
+            <span>Free regeneration used. We hope you love the new result!</span>
+          </div>
+        )}
+
+        {/* Satisfaction Guarantee Trust Badge */}
+        <div className="mb-6 flex items-center justify-center gap-2 text-[11px] font-bold text-emerald-700 bg-emerald-50/60 border border-emerald-100 py-2.5 px-4 rounded-full">
+          <span>🛡️</span>
+          <span>100% Satisfaction Guarantee · Free Regeneration · 14-Day Full Refund</span>
+        </div>
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row justify-center gap-3 border-t border-slate-100 pt-6">

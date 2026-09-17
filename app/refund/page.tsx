@@ -112,6 +112,32 @@ export default function RefundPage() {
             </div>
           </section>
 
+          {/* 3.5 Satisfaction Guarantee & In-App Resolution */}
+          <section>
+            <h2 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2 border-b border-slate-100 pb-2">
+              <span className="text-indigo-600 font-extrabold">3.5</span> 100% 만족 보장 정책 (Satisfaction Guarantee & Free Regeneration)
+            </h2>
+            <div className="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border border-amber-200/80 p-5 rounded-2xl mb-3">
+              <p className="font-extrabold text-amber-950 text-base mb-2 flex items-center gap-2">
+                <span>✨</span> In-App Satisfaction Resolution System
+              </p>
+              <p className="text-xs sm:text-sm text-amber-900 leading-relaxed mb-3">
+                Monopic provides built-in quality assurance measures so that customers can resolve any dissatisfaction directly within the app, without ever needing to initiate a payment dispute (chargeback) with their card issuer.
+              </p>
+              <ul className="list-disc list-inside space-y-2 pl-2 text-xs sm:text-sm text-amber-900">
+                <li>
+                  <strong>1-Click Free Regeneration (무료 재생성)</strong>: AI 결과물이 기대에 미치지 못할 경우, 크레딧 차감 없이 1회 무상으로 즉시 재생성할 수 있습니다. 이를 통해 고객은 추가 비용 없이 개선된 결과물을 즉시 받아볼 수 있습니다.
+                </li>
+                <li>
+                  <strong>In-App Instant Dispute Resolution (앱 내 즉시 해결)</strong>: 앱 내 피드백 모달 및 고객 지원 이메일을 통해 접수된 모든 품질 관련 불만 사항은 24시간 이내에 크레딧 무상 복구 또는 전액 환불로 즉시 해결됩니다.
+                </li>
+                <li>
+                  <strong>Zero-Dispute Commitment (분쟁 제로 서약)</strong>: 위의 안전장치를 통해 고객이 카드사를 통한 결제 분쟁(Chargeback)을 제기할 필요가 전혀 없도록 선제적으로 모든 불만족을 해소합니다.
+                </li>
+              </ul>
+            </div>
+          </section>
+
           {/* 4. 결제 분쟁 및 차지백 방지 안내 */}
           <section>
             <h2 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2 border-b border-slate-100 pb-2">
