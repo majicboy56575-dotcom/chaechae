@@ -10,7 +10,7 @@ import { useAuth } from "../lib/auth/AuthContext";
 import { initializePaddle, type Paddle } from "@paddle/paddle-js";
 
 export default function PricingPage() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { user, loginWithGoogle, logout, loading } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState<PricingPlan>(PRICING_PLANS[1]); // Default to Standard (10장)
   const [currentCredits, setCurrentCredits] = useState<number>(0);
@@ -127,6 +127,7 @@ export default function PricingPage() {
     setPaddleError(null);
 
     const openCheckout = (instance: Paddle) => {
+      const isKorean = language === "ko" || (typeof Intl !== "undefined" && Intl.DateTimeFormat().resolvedOptions().timeZone.includes("Seoul"));
       instance.Checkout.open({
         items: [{ priceId: selectedPlan.paddlePriceId!, quantity: 1 }],
         customData: {
@@ -134,11 +135,16 @@ export default function PricingPage() {
           credits: String(selectedPlan.count),
           planId: selectedPlan.id,
         },
-        customer: user.email ? { email: user.email } : undefined,
+        customer: user.email
+          ? {
+              email: user.email,
+              address: isKorean ? { countryCode: "KR" } : undefined,
+            }
+          : undefined,
         settings: {
           displayMode: "overlay",
           theme: "light",
-          locale: "en",
+          locale: isKorean ? "ko" : "en",
           successUrl: `${window.location.origin}/pricing?payment_success=true&provider=paddle&credits=${selectedPlan.count}&plan=${selectedPlan.id}`,
         },
       });
