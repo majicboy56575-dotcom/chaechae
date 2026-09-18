@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { PRICING_PLANS, type PricingPlan, getTotalAvailableCredits, addLocalCredits, fetchFirestoreCredits, addCreditsServer } from "../lib/pricing";
-import PayPalButton from "../components/PayPalButton";
 import LanguageSelector from "../components/LanguageSelector";
 import { useTranslation } from "../lib/i18n/LanguageContext";
 import { useAuth } from "../lib/auth/AuthContext";
@@ -107,11 +106,6 @@ export default function PricingPage() {
       });
     }
   }, [user?.uid]);
-
-  const handlePaymentSuccess = (orderId: string, plan: PricingPlan) => {
-    setCompletedOrder({ orderId, plan });
-    setCurrentCredits(getTotalAvailableCredits());
-  };
 
   const handlePaddleCheckout = () => {
     if (!user) {
@@ -618,8 +612,8 @@ export default function PricingPage() {
                 </div>
               )}
 
-              {/* Primary Payment: Paddle (Cards, Apple Pay, Google Pay, iDEAL, PayPal) */}
-              <div className="mb-5">
+              {/* Primary Payment: Paddle Unified Checkout (Cards, Apple Pay, Google Pay, PayPal) */}
+              <div className="mb-2">
                 <button
                   onClick={handlePaddleCheckout}
                   disabled={isPaddleLoading}
@@ -628,45 +622,29 @@ export default function PricingPage() {
                   {isPaddleLoading ? (
                     <>
                       <div className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                      <span>결제창 연결 중...</span>
+                      <span>{language === "ko" ? "결제창 연결 중..." : language === "ms" ? "Menghubungkan ke Pembayaran..." : "Connecting to Checkout..."}</span>
                     </>
                   ) : (
                     <>
                       <span>💳</span>
-                      <span>신용/체크카드 · Apple Pay · Google Pay 결제 ({selectedPlan.priceStr})</span>
+                      <span>
+                        {language === "ko"
+                          ? `신용/체크카드 · PayPal · Apple Pay · Google Pay 결제 (${selectedPlan.priceStr})`
+                          : language === "ms"
+                          ? `Bayar dengan Kad / PayPal / Apple Pay / Google Pay (${selectedPlan.priceStr})`
+                          : `Pay with Card / PayPal / Apple Pay / Google Pay (${selectedPlan.priceStr})`}
+                      </span>
                     </>
                   )}
                 </button>
 
-                <div className="flex items-center justify-center gap-3 mt-3 text-[11px] text-slate-500 font-bold">
-                  <span className="flex items-center gap-1">🔒 256-bit 보안 결제</span>
+                <div className="flex items-center justify-center gap-3 mt-4 text-[11px] text-slate-500 font-bold">
+                  <span className="flex items-center gap-1">🔒 {t("pricing_trust_ssl")}</span>
                   <span>•</span>
-                  <span>⚡ 결제 즉시 자동 적립</span>
+                  <span>⚡ {t("pricing_trust_instant")}</span>
+                  <span>•</span>
+                  <span>🛡️ 100% {t("modal_success_badge") || "Protected"}</span>
                 </div>
-              </div>
-
-              {/* Divider */}
-              <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-100"></div>
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-3 text-slate-400 font-bold">
-                    또는 (OR)
-                  </span>
-                </div>
-              </div>
-
-              {/* Secondary Payment: PayPal */}
-              <div className="mb-4">
-                <p className="text-xs text-slate-500 font-bold mb-2.5 text-center flex items-center justify-center gap-1.5">
-                  <span>🅿️</span>
-                  <span>PayPal 계정으로 결제하기</span>
-                </p>
-                <PayPalButton
-                  plan={selectedPlan}
-                  onSuccess={handlePaymentSuccess}
-                />
               </div>
             </>
           ) : (
