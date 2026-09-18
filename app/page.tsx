@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import UploadCard from "./components/UploadCard";
@@ -13,6 +14,7 @@ import { useAuth } from "./lib/auth/AuthContext";
 import { useInstallApp } from "./lib/useInstallApp";
 
 export default function Home() {
+  const router = useRouter();
   const { t } = useTranslation();
   const [currentCredits, setCurrentCredits] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -37,6 +39,12 @@ export default function Home() {
   }, [user?.uid]);
 
   const scrollToUpload = () => {
+    const available = getTotalAvailableCredits();
+    if (available <= 0) {
+      alert("보유 크레딧이 없습니다. 크레딧 충전 페이지로 이동합니다.");
+      router.push("/pricing");
+      return;
+    }
     const element = document.getElementById("upload-section");
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });

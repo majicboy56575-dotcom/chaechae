@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, ChangeEvent } from "react";
+import { useRouter } from "next/navigation";
 import {
   BG_COLORS,
   CATEGORIES,
@@ -43,6 +44,7 @@ const LOADING_MESSAGES = [
 const FUN_STYLE_IDS = STYLES.filter((s) => s.category === "fun").map((s) => s.id);
 
 export default function UploadCard() {
+  const router = useRouter();
   const { t } = useTranslation();
   const { user, loginWithGoogle } = useAuth();
   const [selfieBase64, setSelfieBase64] = useState<string | null>(null);
@@ -112,6 +114,12 @@ export default function UploadCard() {
       loginWithGoogle();
       return;
     }
+    const available = getTotalAvailableCredits();
+    if (available <= 0) {
+      alert("보유 크레딧이 없습니다. 크레딧 충전 페이지로 이동합니다.");
+      router.push("/pricing");
+      return;
+    }
     const files = e.target.files;
     if (!files || files.length === 0) return;
     processFile(files[0]);
@@ -155,6 +163,12 @@ export default function UploadCard() {
       loginWithGoogle();
       return;
     }
+    const available = getTotalAvailableCredits();
+    if (available <= 0) {
+      alert("보유 크레딧이 없습니다. 크레딧 충전 페이지로 이동합니다.");
+      router.push("/pricing");
+      return;
+    }
     fileInputRef.current?.click();
   };
 
@@ -175,6 +189,12 @@ export default function UploadCard() {
     if (!user) {
       alert("로그인이 필요합니다. Google 로그인 페이지로 이동합니다.");
       loginWithGoogle();
+      return;
+    }
+    const available = getTotalAvailableCredits();
+    if (available <= 0) {
+      alert("보유 크레딧이 없습니다. 크레딧 충전 페이지로 이동합니다.");
+      router.push("/pricing");
       return;
     }
     const files = e.dataTransfer.files;
@@ -219,7 +239,8 @@ export default function UploadCard() {
 
     const availableCredits = getTotalAvailableCredits();
     if (availableCredits <= 0) {
-      setError(t("error_no_credits") || "보유 크레딧이 부족합니다. 요금제에서 크레딧을 충전해 주세요.");
+      alert("보유 크레딧이 부족합니다. 크레딧 충전 페이지로 이동합니다.");
+      router.push("/pricing");
       return;
     }
 
