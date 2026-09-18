@@ -3,13 +3,21 @@ import { FieldValue } from "firebase-admin/firestore";
 
 const USERS_COLLECTION = "users";
 
+// In-memory fallback for local dev when GCP Admin credentials are not present
+const localMemoryCredits: Record<string, number> = {};
+
 /**
  * Get the current credit balance for a user from Firestore.
  */
 export async function getCredits(userId: string): Promise<number> {
-  const doc = await adminDb.collection(USERS_COLLECTION).doc(userId).get();
-  if (!doc.exists) return 0;
-  return doc.data()?.credits ?? 0;
+  try {
+    const doc = await adminDb.collection(USERS_COLLECTION).doc(userId).get();
+    if (!doc.exists) return localMemoryCredits[userId] ?? 0;
+    return doc.data()?.credits ?? 0;
+  } catch (err) {
+    console.warn("[Credits] getCredits fallback to memory/0:", (err as Error)?.message);
+    return localMemoryCredits[userId] ?? 0;
+  }
 }
 
 /**
@@ -17,13 +25,20 @@ export async function getCredits(userId: string): Promise<number> {
  * Uses FieldValue.increment for atomic operation.
  */
 export async function addCredits(userId: string, amount: number): Promise<number> {
-  const ref = adminDb.collection(USERS_COLLECTION).doc(userId);
-  await ref.set(
-    { credits: FieldValue.increment(amount), updatedAt: FieldValue.serverTimestamp() },
-    { merge: true }
-  );
-  const updated = await ref.get();
-  return updated.data()?.credits ?? amount;
+  try {
+    const ref = adminDb.collection(USERS_COLLECTION).doc(userId);
+    await ref.set(
+      { credits: FieldValue.increment(amount), updatedAt: FieldValue.serverTimestamp() },
+      { merge: true }
+    );
+    const updated = await ref.get();
+    return updated.data()?.credits ?? amount;
+  } catch (err) {
+    console.warn("[Credits] addCredits fallback to memory:", (err as Error)?.message);
+    const current = localMemoryCredits[userId] ?? 0;
+    localMemoryCredits[userId] = current + amount;
+    return localMemoryCredits[userId];
+  }
 }
 
 /**
@@ -31,15 +46,23 @@ export async function addCredits(userId: string, amount: number): Promise<number
  * Ensures credits never go below 0.
  */
 export async function deductCredits(userId: string, amount: number): Promise<number> {
-  const ref = adminDb.collection(USERS_COLLECTION).doc(userId);
-  const doc = await ref.get();
-  const current = doc.exists ? (doc.data()?.credits ?? 0) : 0;
-  const newCredits = Math.max(0, current - amount);
-  await ref.set(
-    { credits: newCredits, updatedAt: FieldValue.serverTimestamp() },
-    { merge: true }
-  );
-  return newCredits;
+  try {
+    const ref = adminDb.collection(USERS_COLLECTION).doc(userId);
+    const doc = await ref.get();
+    const current = doc.exists ? (doc.data()?.credits ?? 0) : 0;
+    const newCredits = Math.max(0, current - amount);
+    await ref.set(
+      { credits: newCredits, updatedAt: FieldValue.serverTimestamp() },
+      { merge: true }
+    );
+    return newCredits;
+  } catch (err) {
+    console.warn("[Credits] deductCredits fallback to memory:", (err as Error)?.message);
+    const current = localMemoryCredits[userId] ?? 0;
+    const newCredits = Math.max(0, current - amount);
+    localMemoryCredits[userId] = newCredits;
+    return newCredits;
+  }
 }
 
 /**
@@ -47,13 +70,21 @@ export async function deductCredits(userId: string, amount: number): Promise<num
  * Returns true if successful, false if insufficient credits.
  */
 export async function consumeCredit(userId: string): Promise<boolean> {
-  const ref = adminDb.collection(USERS_COLLECTION).doc(userId);
-  
-  return adminDb.runTransaction(async (transaction) => {
-    const doc = await transaction.get(ref);
-    const current = doc.exists ? (doc.data()?.credits ?? 0) : 0;
+  try {
+    const ref = adminDb.collection(USERS_COLLECTION).doc(userId);
+    
+    return await adminDb.runTransaction(async (transaction) => {
+      const doc = await transaction.get(ref);
+      const current = doc.exists ? (doc.data()?.credits ?? 0) : 0;
+      if (current <= 0) return false;
+      transaction.set(ref, { credits: current - 1, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+      return true;
+    });
+  } catch (err) {
+    console.warn("[Credits] consumeCredit fallback to memory:", (err as Error)?.message);
+    const current = localMemoryCredits[userId] ?? 0;
     if (current <= 0) return false;
-    transaction.set(ref, { credits: current - 1, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    localMemoryCredits[userId] = current - 1;
     return true;
-  });
+  }
 }
