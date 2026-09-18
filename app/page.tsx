@@ -83,7 +83,7 @@ export default function Home() {
               <span>💳</span> {t("nav_pricing")}
             </a>
             <a href="#safety" className="hover:text-indigo-600 transition-colors flex items-center gap-1">
-              <span>🛡️</span> AI 윤리·안전
+              <span>🛡️</span> {t("nav_safety" as keyof typeof import("./lib/i18n/translations").translations.ms) || "Etika & Keselamatan AI"}
             </a>
             {canInstall && (
               <button
@@ -211,7 +211,7 @@ export default function Home() {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="hover:text-indigo-600 transition-colors py-2 border-b border-slate-50 flex items-center gap-1.5 font-bold text-slate-700"
               >
-                <span>🛡️</span> AI 윤리·안전
+                <span>🛡️</span> {t("nav_safety" as keyof typeof import("./lib/i18n/translations").translations.ms) || "Etika & Keselamatan AI"}
               </a>
               {canInstall && (
                 <button
