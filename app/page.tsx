@@ -8,7 +8,7 @@ import LanguageSelector from "./components/LanguageSelector";
 import FeedbackModal from "./components/FeedbackModal";
 import { useTranslation } from "./lib/i18n/LanguageContext";
 import { CATEGORIES, STYLES } from "./lib/styles";
-import { getTotalAvailableCredits, PRICING_PLANS } from "./lib/pricing";
+import { getTotalAvailableCredits, fetchFirestoreCredits, getDailyFreeRemaining, PRICING_PLANS } from "./lib/pricing";
 import { useAuth } from "./lib/auth/AuthContext";
 import { useInstallApp } from "./lib/useInstallApp";
 
@@ -26,6 +26,15 @@ export default function Home() {
     window.addEventListener("chae_chae_credits_updated", handleUpdate);
     return () => window.removeEventListener("chae_chae_credits_updated", handleUpdate);
   }, []);
+
+  // Sync credits from Firestore when user logs in
+  useEffect(() => {
+    if (user?.uid) {
+      fetchFirestoreCredits(user.uid).then((credits) => {
+        setCurrentCredits(credits + getDailyFreeRemaining());
+      });
+    }
+  }, [user?.uid]);
 
   const scrollToUpload = () => {
     const element = document.getElementById("upload-section");

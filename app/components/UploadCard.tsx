@@ -10,7 +10,7 @@ import {
   type CategoryId,
 } from "../lib/styles";
 import { PRINT_SIZES, generatePhotoSheet, type PrintSize } from "../lib/photoSheet";
-import { getTotalAvailableCredits, consumeLocalCredit } from "../lib/pricing";
+import { getTotalAvailableCredits, consumeLocalCredit, consumeCreditServer } from "../lib/pricing";
 import CompareSlider from "./CompareSlider";
 import { useTranslation } from "../lib/i18n/LanguageContext";
 import { useAuth } from "../lib/auth/AuthContext";
@@ -251,8 +251,12 @@ export default function UploadCard() {
         throw new Error(data.error || "Failed to generate AI image.");
       }
 
-      // Deduct 1 credit upon success
-      consumeLocalCredit();
+      // Deduct 1 credit upon success (server-side Firestore + localStorage sync)
+      if (user?.uid) {
+        await consumeCreditServer(user.uid);
+      } else {
+        consumeLocalCredit();
+      }
 
       setUsedStyleId(selectedStyleId);
       setResult({

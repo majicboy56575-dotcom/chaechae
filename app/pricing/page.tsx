@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { PRICING_PLANS, type PricingPlan, getTotalAvailableCredits, addLocalCredits } from "../lib/pricing";
+import { PRICING_PLANS, type PricingPlan, getTotalAvailableCredits, addLocalCredits, fetchFirestoreCredits } from "../lib/pricing";
 import PayPalButton from "../components/PayPalButton";
 import LanguageSelector from "../components/LanguageSelector";
 import { useTranslation } from "../lib/i18n/LanguageContext";
@@ -90,6 +90,15 @@ export default function PricingPage() {
 
     return () => window.removeEventListener("chae_chae_credits_updated", handleUpdate);
   }, [selectedPlan]);
+
+  // Sync credits from Firestore when user logs in
+  useEffect(() => {
+    if (user?.uid) {
+      fetchFirestoreCredits(user.uid).then(() => {
+        setCurrentCredits(getTotalAvailableCredits());
+      });
+    }
+  }, [user?.uid]);
 
   const handlePaymentSuccess = (orderId: string, plan: PricingPlan) => {
     setCompletedOrder({ orderId, plan });

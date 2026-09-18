@@ -157,3 +157,64 @@ export function consumeLocalCredit(): boolean {
     return true;
   }
 }
+
+// ─── Firestore Credit Sync ──────────────────────────────────────
+
+/**
+ * Fetch credits from Firestore via API and sync to localStorage.
+ * Returns the server-side credit balance.
+ */
+export async function fetchFirestoreCredits(userId: string): Promise<number> {
+  try {
+    const res = await fetch(`/api/credits?userId=${encodeURIComponent(userId)}`);
+    if (!res.ok) return getLocalCredits();
+    const data = await res.json();
+    const serverCredits = data.credits ?? 0;
+    // Sync to localStorage for fast UI
+    if (typeof window !== "undefined") {
+      localStorage.setItem(CREDIT_STORAGE_KEY, serverCredits.toString());
+      window.dispatchEvent(new Event("chae_chae_credits_updated"));
+    }
+    return serverCredits;
+  } catch {
+    return getLocalCredits();
+  }
+}
+
+/**
+ * Consume 1 credit via server API (Firestore atomic transaction).
+ * Also updates localStorage for immediate UI feedback.
+ * Returns true if successful, false if insufficient credits.
+ */
+export async function consumeCreditServer(userId: string): Promise<boolean> {
+  try {
+    const res = await fetch("/api/credits/consume", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId }),
+    });
+    const data = await res.json();
+    if (!res.ok) return false;
+    // Sync remaining credits to localStorage
+    if (typeof window !== "undefined" && data.credits !== undefined) {
+      localStorage.setItem(CREDIT_STORAGE_KEY, data.credits.toString());
+      window.dispatchEvent(new Event("chae_chae_credits_updated"));
+    }
+    return data.success === true;
+  } catch {
+    // Fallback to local credit consumption
+    return consumeLocalCredit();
+  }
+}
+
+/**
+ * Set localStorage credits to a specific value (used after Firestore sync).
+ */
+export function setLocalCredits(amount: number): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(CREDIT_STORAGE_KEY, amount.toString());
+    window.dispatchEvent(new Event("chae_chae_credits_updated"));
+  } catch {}
+}
+
