@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import { type PricingPlan, addLocalCredits } from "../lib/pricing";
+import { type PricingPlan, addLocalCredits, addCreditsServer } from "../lib/pricing";
 import { useTranslation } from "../lib/i18n/LanguageContext";
+import { useAuth } from "../lib/auth/AuthContext";
 
 interface PayPalButtonProps {
   plan: PricingPlan;
@@ -13,6 +14,7 @@ interface PayPalButtonProps {
 
 export default function PayPalButton({ plan, onSuccess, onError }: PayPalButtonProps) {
   const { currentLanguageInfo, t } = useTranslation();
+  const { user } = useAuth();
   const [isMounted, setIsMounted] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -88,8 +90,12 @@ export default function PayPalButton({ plan, onSuccess, onError }: PayPalButtonP
                 const details = await actions.order.capture();
                 const orderId = details.id || data.orderID;
                 
-                // Add credits to local storage
-                addLocalCredits(plan.count);
+                // Add credits to server DB and local storage
+                if (user?.uid) {
+                  await addCreditsServer(user.uid, plan.count);
+                } else {
+                  addLocalCredits(plan.count);
+                }
 
                 onSuccess(orderId, plan);
               } catch (err: unknown) {

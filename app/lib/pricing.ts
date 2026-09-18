@@ -161,23 +161,58 @@ export function consumeLocalCredit(): boolean {
 // ─── Firestore Credit Sync ──────────────────────────────────────
 
 /**
- * Fetch credits from Firestore via API and sync to localStorage.
- * Returns the server-side credit balance.
+ * Add credits via server API (Firestore atomic increment).
+ * Also updates localStorage for immediate UI feedback.
+ */
+export async function addCreditsServer(userId: string, amount: number): Promise<number> {
+  if (typeof window !== "undefined") {
+    addLocalCredits(amount);
+  }
+  try {
+    const res = await fetch("/api/credits/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, amount }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (typeof data.credits === "number" && typeof window !== "undefined") {
+        setLocalCredits(data.credits);
+        return data.credits;
+      }
+    }
+  } catch (err) {
+    console.warn("Failed to sync added credits to server:", err);
+  }
+  return getLocalCredits();
+}
+
+/**
+ * Fetch credits from Firestore via API and safely sync with localStorage.
+ * Never resets local credits to 0 if local already has credits.
  */
 export async function fetchFirestoreCredits(userId: string): Promise<number> {
+  const localCredits = getLocalCredits();
   try {
     const res = await fetch(`/api/credits?userId=${encodeURIComponent(userId)}`);
-    if (!res.ok) return getLocalCredits();
+    if (!res.ok) return localCredits;
     const data = await res.json();
-    const serverCredits = data.credits ?? 0;
-    // Sync to localStorage for fast UI
+    const serverCredits = typeof data.credits === "number" ? data.credits : 0;
+
+    // If local has more credits than server (e.g. from recent purchase or legacy), sync to server!
+    if (localCredits > serverCredits) {
+      const diff = localCredits - serverCredits;
+      await addCreditsServer(userId, diff);
+      return localCredits;
+    }
+
+    // If server has more or equal, update local
     if (typeof window !== "undefined") {
-      localStorage.setItem(CREDIT_STORAGE_KEY, serverCredits.toString());
-      window.dispatchEvent(new Event("chae_chae_credits_updated"));
+      setLocalCredits(serverCredits);
     }
     return serverCredits;
   } catch {
-    return getLocalCredits();
+    return localCredits;
   }
 }
 
@@ -197,8 +232,7 @@ export async function consumeCreditServer(userId: string): Promise<boolean> {
     if (!res.ok) return false;
     // Sync remaining credits to localStorage
     if (typeof window !== "undefined" && data.credits !== undefined) {
-      localStorage.setItem(CREDIT_STORAGE_KEY, data.credits.toString());
-      window.dispatchEvent(new Event("chae_chae_credits_updated"));
+      setLocalCredits(data.credits);
     }
     return data.success === true;
   } catch {

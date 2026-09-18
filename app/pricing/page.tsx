@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { PRICING_PLANS, type PricingPlan, getTotalAvailableCredits, addLocalCredits, fetchFirestoreCredits } from "../lib/pricing";
+import { PRICING_PLANS, type PricingPlan, getTotalAvailableCredits, addLocalCredits, fetchFirestoreCredits, addCreditsServer } from "../lib/pricing";
 import PayPalButton from "../components/PayPalButton";
 import LanguageSelector from "../components/LanguageSelector";
 import { useTranslation } from "../lib/i18n/LanguageContext";
@@ -38,7 +38,11 @@ export default function PricingPage() {
           const eventData = event.data as Record<string, unknown> | undefined;
           const customData = eventData?.custom_data as Record<string, string> | undefined;
           const creditsToAdd = customData?.credits ? parseInt(customData.credits, 10) : selectedPlan.count;
-          addLocalCredits(creditsToAdd);
+          if (user?.uid) {
+            addCreditsServer(user.uid, creditsToAdd);
+          } else {
+            addLocalCredits(creditsToAdd);
+          }
           // Mark as processed to prevent double-adding from successUrl redirect
           try { sessionStorage.setItem("paddle_checkout_processed", "true"); } catch {}
           setCompletedOrder({
@@ -74,7 +78,11 @@ export default function PricingPage() {
           // Only add credits if not already processed by checkout.completed callback
           const creditsToAdd = parseInt(params.get("credits") || "0", 10);
           if (creditsToAdd > 0) {
-            addLocalCredits(creditsToAdd);
+            if (user?.uid) {
+              addCreditsServer(user.uid, creditsToAdd);
+            } else {
+              addLocalCredits(creditsToAdd);
+            }
           }
         }
 
