@@ -39,6 +39,8 @@ export default function PricingPage() {
           const customData = eventData?.custom_data as Record<string, string> | undefined;
           const creditsToAdd = customData?.credits ? parseInt(customData.credits, 10) : selectedPlan.count;
           addLocalCredits(creditsToAdd);
+          // Mark as processed to prevent double-adding from successUrl redirect
+          try { sessionStorage.setItem("paddle_checkout_processed", "true"); } catch {}
           setCompletedOrder({
             orderId: (eventData?.id as string) || `PD-${Date.now().toString(36).toUpperCase()}`,
             plan: selectedPlan,
@@ -55,20 +57,33 @@ export default function PricingPage() {
       });
 
     // Handle return from Paddle checkout redirect (fallback)
+    // Skip if credits were already added via checkout.completed event callback
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       if (params.get("payment_success") === "true") {
-        const creditsToAdd = parseInt(params.get("credits") || "0", 10);
+        const alreadyProcessed = (() => {
+          try { return sessionStorage.getItem("paddle_checkout_processed") === "true"; } catch { return false; }
+        })();
+        // Clean up the flag
+        try { sessionStorage.removeItem("paddle_checkout_processed"); } catch {}
+
         const planId = params.get("plan");
         const matchedPlan = PRICING_PLANS.find((p) => p.id === planId) || PRICING_PLANS[1];
-        if (creditsToAdd > 0) {
-          addLocalCredits(creditsToAdd);
-          setCompletedOrder({
-            orderId: `PD-${Date.now().toString(36).toUpperCase()}`,
-            plan: matchedPlan,
-          });
-          setCurrentCredits(getTotalAvailableCredits());
+
+        if (!alreadyProcessed) {
+          // Only add credits if not already processed by checkout.completed callback
+          const creditsToAdd = parseInt(params.get("credits") || "0", 10);
+          if (creditsToAdd > 0) {
+            addLocalCredits(creditsToAdd);
+          }
         }
+
+        // Always show success UI
+        setCompletedOrder({
+          orderId: `PD-${Date.now().toString(36).toUpperCase()}`,
+          plan: matchedPlan,
+        });
+        setCurrentCredits(getTotalAvailableCredits());
         window.history.replaceState({}, document.title, window.location.pathname);
       }
     }
