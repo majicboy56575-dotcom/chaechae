@@ -1,8 +1,16 @@
 # 🚀 Monopic Session Summary & Next Steps Guide
 
-> **최종 업데이트**: 2026-09-16  
-> **현재 상태**: Paddle & Lemon Squeezy 재승인 심사 준비 및 깃 푸시 완료 (`Pending` 상태)  
+> **최종 업데이트**: 2026-09-29  
+> **현재 상태**: 말레이어 전면 i18n 적용, 메타 픽셀 전환 추적(ViewContent, InitiateCheckout, Purchase) 탑재, 메타 광고 퍼널 분석 보고서 작성 및 GitHub 푸시 완료  
 > **라이브 서비스**: https://chaechae--chae-chae.asia-east1.hosted.app  
+> **메타 픽셀 ID**: `2602221480295821` / **광고 계정**: `2102865683953285`  
+
+---
+
+## 📌 0. 최근 메타 광고 분석 및 픽셀 전환 추적 작업 (2026-09-29)
+- 자세한 분석 보고서: [META_ADS_ANALYSIS_AND_PIXEL_TRACKING.md](file:///c:/App/proshot/proshot/META_ADS_ANALYSIS_AND_PIXEL_TRACKING.md)
+- **광고 성과 요약 (지출 ₩74,676)**: 노출 15,150회 / 클릭 540회 (CTR 3.56%, CPC ~138원) / 랜딩 페이지 조회 358회 (도달률 66.3%)
+- **개선 사항**: 말레이어(`ms`) 하드코딩 한국어 alert 제거, 픽셀 3단계 전환 이벤트 및 noscript 픽셀 ID 수정, 광고 관리자 전환 퍼널 열 맞춤설정 가이드 제공.
 
 ---
 
