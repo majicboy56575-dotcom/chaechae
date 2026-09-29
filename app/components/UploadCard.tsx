@@ -110,13 +110,13 @@ export default function UploadCard() {
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     setError(null);
     if (!user) {
-      alert("로그인이 필요합니다. Google 로그인 페이지로 이동합니다.");
+      alert(t("alert_login_required"));
       loginWithGoogle();
       return;
     }
     const available = getTotalAvailableCredits();
     if (available <= 0) {
-      alert("보유 크레딧이 없습니다. 크레딧 충전 페이지로 이동합니다.");
+      alert(t("alert_no_credits"));
       router.push("/pricing");
       return;
     }
@@ -159,13 +159,13 @@ export default function UploadCard() {
 
   const triggerFileInput = () => {
     if (!user) {
-      alert("로그인이 필요합니다. Google 로그인 페이지로 이동합니다.");
+      alert(t("alert_login_required"));
       loginWithGoogle();
       return;
     }
     const available = getTotalAvailableCredits();
     if (available <= 0) {
-      alert("보유 크레딧이 없습니다. 크레딧 충전 페이지로 이동합니다.");
+      alert(t("alert_no_credits"));
       router.push("/pricing");
       return;
     }
@@ -187,13 +187,13 @@ export default function UploadCard() {
     setIsDragging(false);
     setError(null);
     if (!user) {
-      alert("로그인이 필요합니다. Google 로그인 페이지로 이동합니다.");
+      alert(t("alert_login_required"));
       loginWithGoogle();
       return;
     }
     const available = getTotalAvailableCredits();
     if (available <= 0) {
-      alert("보유 크레딧이 없습니다. 크레딧 충전 페이지로 이동합니다.");
+      alert(t("alert_no_credits"));
       router.push("/pricing");
       return;
     }
@@ -231,7 +231,7 @@ export default function UploadCard() {
 
   const handleSubmit = async () => {
     if (!user) {
-      alert("로그인이 필요합니다. Google 로그인 페이지로 이동합니다.");
+      alert(t("alert_login_required"));
       loginWithGoogle();
       return;
     }
@@ -239,7 +239,7 @@ export default function UploadCard() {
 
     const availableCredits = getTotalAvailableCredits();
     if (availableCredits <= 0) {
-      alert("보유 크레딧이 부족합니다. 크레딧 충전 페이지로 이동합니다.");
+      alert(t("alert_no_credits"));
       router.push("/pricing");
       return;
     }

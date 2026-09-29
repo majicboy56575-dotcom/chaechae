@@ -42,6 +42,16 @@ export default function PricingPage() {
           } else {
             addLocalCredits(creditsToAdd);
           }
+          // Meta Pixel: Purchase event
+          if (typeof window !== "undefined" && typeof (window as unknown as Record<string, unknown>).fbq === "function") {
+            (window as unknown as { fbq: (...args: unknown[]) => void }).fbq("track", "Purchase", {
+              value: selectedPlan.price,
+              currency: "USD",
+              content_name: selectedPlan.name,
+              content_ids: [selectedPlan.id],
+              num_items: selectedPlan.count,
+            });
+          }
           // Mark as processed to prevent double-adding from successUrl redirect
           try { sessionStorage.setItem("paddle_checkout_processed", "true"); } catch {}
           setCompletedOrder({
@@ -107,6 +117,16 @@ export default function PricingPage() {
     }
   }, [user?.uid]);
 
+  // Meta Pixel: ViewContent when pricing page loads
+  useEffect(() => {
+    if (typeof window !== "undefined" && typeof (window as unknown as Record<string, unknown>).fbq === "function") {
+      (window as unknown as { fbq: (...args: unknown[]) => void }).fbq("track", "ViewContent", {
+        content_name: "Pricing Page",
+        content_category: "pricing",
+      });
+    }
+  }, []);
+
   const handlePaddleCheckout = () => {
     if (!user) {
       loginWithGoogle();
@@ -119,6 +139,17 @@ export default function PricingPage() {
 
     setIsPaddleLoading(true);
     setPaddleError(null);
+
+    // Meta Pixel: InitiateCheckout event
+    if (typeof window !== "undefined" && typeof (window as unknown as Record<string, unknown>).fbq === "function") {
+      (window as unknown as { fbq: (...args: unknown[]) => void }).fbq("track", "InitiateCheckout", {
+        value: selectedPlan.price,
+        currency: "USD",
+        content_name: selectedPlan.name,
+        content_ids: [selectedPlan.id],
+        num_items: selectedPlan.count,
+      });
+    }
 
     const openCheckout = (instance: Paddle) => {
       const isKorean = language === "ko" || (typeof Intl !== "undefined" && Intl.DateTimeFormat().resolvedOptions().timeZone.includes("Seoul"));
@@ -439,8 +470,8 @@ export default function PricingPage() {
                 ⚠️
               </div>
               <div className="text-left">
-                <p className="text-[10px] font-black text-amber-600 uppercase tracking-wider">로그인 상태</p>
-                <p className="text-xs font-bold text-amber-800">결제 및 크레딧 충전을 위해 로그인이 필요합니다.</p>
+                <p className="text-[10px] font-black text-amber-600 uppercase tracking-wider">{t("pricing_login_status")}</p>
+                <p className="text-xs font-bold text-amber-800">{t("pricing_login_required_desc")}</p>
               </div>
             </div>
             <button
@@ -650,9 +681,9 @@ export default function PricingPage() {
           ) : (
             <div className="mb-6 p-6 rounded-2xl bg-amber-50/60 border border-amber-200/70 text-center flex flex-col items-center">
               <span className="text-2xl mb-2">⚠️</span>
-              <h5 className="text-xs font-black text-amber-800 uppercase tracking-wider mb-1">로그인이 필요합니다</h5>
+              <h5 className="text-xs font-black text-amber-800 uppercase tracking-wider mb-1">{t("pricing_login_required_title")}</h5>
               <p className="text-[11px] font-bold text-amber-700 max-w-xs mb-4 leading-relaxed">
-                결제 완료 후 크레딧을 안전하게 적립하기 위해 먼저 계정 로그인을 진행해 주세요.
+                {t("pricing_login_required_credits")}
               </p>
               <button
                 onClick={loginWithGoogle}

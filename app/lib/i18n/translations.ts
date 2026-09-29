@@ -33,6 +33,12 @@ export const translations = {
     nav_logout: "로그아웃",
     error_no_credits: "보유 크레딧이 부족합니다. 요금제에서 크레딧을 충전해 주세요.",
     btn_go_to_pricing: "크레딧 충전하기 💳",
+    alert_no_credits: "보유 크레딧이 없습니다. 크레딧 충전 페이지로 이동합니다.",
+    alert_login_required: "로그인이 필요합니다. Google 로그인을 진행합니다.",
+    pricing_login_status: "로그인 상태",
+    pricing_login_required_title: "로그인이 필요합니다",
+    pricing_login_required_desc: "결제 및 크레딧 충전을 위해 로그인이 필요합니다.",
+    pricing_login_required_credits: "결제 완료 후 크레딧을 안전하게 적립하기 위해 먼저 계정 로그인을 진행해 주세요.",
 
     // Hero Section
     hero_badge: "AI 포토 스튜디오",
@@ -257,6 +263,12 @@ export const translations = {
     nav_logout: "Sign Out",
     error_no_credits: "Insufficient credits. Please top up your credits on the pricing page.",
     btn_go_to_pricing: "Top Up Credits 💳",
+    alert_no_credits: "No credits available. Redirecting to the pricing page.",
+    alert_login_required: "Login is required. Proceeding to Google Sign-In.",
+    pricing_login_status: "Login Status",
+    pricing_login_required_title: "Login Required",
+    pricing_login_required_desc: "Please log in to purchase and recharge credits.",
+    pricing_login_required_credits: "Please sign in first so your credits can be safely added after payment.",
 
     // Hero Section
     hero_badge: "AI Photo Studio",
@@ -481,6 +493,12 @@ export const translations = {
     nav_logout: "ออกจากระบบ",
     error_no_credits: "เครดิตของคุณไม่เพียงพอ กรุณาเติมเครดิตในหน้าแพ็กเกจ",
     btn_go_to_pricing: "เติมเครดิต 💳",
+    alert_no_credits: "ไม่มีเครดิต กำลังไปยังหน้าแพ็กเกจ",
+    alert_login_required: "ต้องเข้าสู่ระบบ กำลังไปยัง Google Sign-In",
+    pricing_login_status: "สถานะการเข้าสู่ระบบ",
+    pricing_login_required_title: "ต้องเข้าสู่ระบบ",
+    pricing_login_required_desc: "กรุณาเข้าสู่ระบบเพื่อซื้อและเติมเครดิต",
+    pricing_login_required_credits: "กรุณาเข้าสู่ระบบก่อนเพื่อให้เครดิตของคุณถูกเพิ่มอย่างปลอดภัยหลังชำระเงิน",
 
     // Hero Section
     hero_badge: "สตูดิโอภาพถ่าย AI",
@@ -705,6 +723,12 @@ export const translations = {
     nav_logout: "Đăng xuất",
     error_no_credits: "Bạn không đủ lượt (credit). Vui lòng nạp thêm tại trang bảng giá.",
     btn_go_to_pricing: "Nạp thêm lượt 💳",
+    alert_no_credits: "Không có lượt. Đang chuyển đến trang gói cước.",
+    alert_login_required: "Cần đăng nhập. Đang chuyển đến Google Sign-In.",
+    pricing_login_status: "Trạng thái đăng nhập",
+    pricing_login_required_title: "Cần đăng nhập",
+    pricing_login_required_desc: "Vui lòng đăng nhập để mua và nạp lượt.",
+    pricing_login_required_credits: "Vui lòng đăng nhập trước để lượt được cộng an toàn sau khi thanh toán.",
 
     // Hero Section
     hero_badge: "Studio ảnh AI",
@@ -929,6 +953,12 @@ export const translations = {
     nav_logout: "Keluar",
     error_no_credits: "Kredit Anda tidak mencukupi. Silakan isi ulang kredit di halaman harga.",
     btn_go_to_pricing: "Isi Ulang Kredit 💳",
+    alert_no_credits: "Tidak ada kredit. Mengalihkan ke halaman harga.",
+    alert_login_required: "Login diperlukan. Melanjutkan ke Google Sign-In.",
+    pricing_login_status: "Status Login",
+    pricing_login_required_title: "Login Diperlukan",
+    pricing_login_required_desc: "Silakan login untuk membeli dan mengisi ulang kredit.",
+    pricing_login_required_credits: "Silakan login terlebih dahulu agar kredit Anda dapat ditambahkan dengan aman setelah pembayaran.",
 
     // Hero Section
     hero_badge: "Studio Foto AI",
@@ -1153,6 +1183,12 @@ export const translations = {
     nav_logout: "সাইন আউট",
     error_no_credits: "আপনার পর্যাপ্ত ক্রেডিট নেই। অনুগ্রহ করে মূল্য নির্ধারণ পৃষ্ঠা থেকে ক্রেডিট টপ আপ করুন।",
     btn_go_to_pricing: "ক্রেডিট টপ আপ করুন 💳",
+    alert_no_credits: "ক্রেডিট নেই। মূল্য পৃষ্ঠায় যাচ্ছে।",
+    alert_login_required: "লগইন প্রয়োজন। Google Sign-In এ যাচ্ছে।",
+    pricing_login_status: "লগইন স্ট্যাটাস",
+    pricing_login_required_title: "লগইন প্রয়োজন",
+    pricing_login_required_desc: "ক্রেডিট কেনা ও টপ আপ করতে লগইন করুন।",
+    pricing_login_required_credits: "পেমেন্টের পরে নিরাপদে ক্রেডিট যোগ করতে প্রথমে লগইন করুন।",
 
     // Hero Section
     hero_badge: "এআই ফটো স্টুডিও",
@@ -1377,6 +1413,12 @@ export const translations = {
     nav_logout: "Log Keluar",
     error_no_credits: "Baki kredit tidak mencukupi. Sila tambah nilai kredit di halaman harga.",
     btn_go_to_pricing: "Tambah Nilai Kredit 💳",
+    alert_no_credits: "Tiada kredit tersedia. Mengalihkan ke halaman harga.",
+    alert_login_required: "Log masuk diperlukan. Meneruskan ke Google Log Masuk.",
+    pricing_login_status: "Status Log Masuk",
+    pricing_login_required_title: "Log Masuk Diperlukan",
+    pricing_login_required_desc: "Sila log masuk untuk membeli dan menambah nilai kredit.",
+    pricing_login_required_credits: "Sila log masuk terlebih dahulu supaya kredit anda dapat ditambah dengan selamat selepas pembayaran.",
 
     // Hero Section
     hero_badge: "Studio Foto AI",
@@ -1601,6 +1643,12 @@ export const translations = {
     nav_logout: "लॉग आउट",
     error_no_credits: "पर्याप्त क्रेडिट नहीं हैं। कृपया मूल्य निर्धारण पृष्ठ पर क्रेडिट रिचार्ज करें।",
     btn_go_to_pricing: "क्रेडिट रिचार्ज करें 💳",
+    alert_no_credits: "क्रेडिट नहीं है। मूल्य निर्धारण पृष्ठ पर जा रहे हैं।",
+    alert_login_required: "लॉगिन आवश्यक है। Google Sign-In पर जा रहे हैं।",
+    pricing_login_status: "लॉगिन स्टेटस",
+    pricing_login_required_title: "लॉगिन आवश्यक",
+    pricing_login_required_desc: "क्रेडिट खरीदने और रिचार्ज करने के लिए लॉगिन करें।",
+    pricing_login_required_credits: "भुगतान के बाद क्रेडिट सुरक्षित रूप से जोड़ने के लिए पहले लॉगिन करें।",
 
     // Hero Section
     hero_badge: "AI फोटो स्टूडियो",

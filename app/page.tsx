@@ -41,7 +41,7 @@ export default function Home() {
   const scrollToUpload = () => {
     const available = getTotalAvailableCredits();
     if (available <= 0) {
-      alert("보유 크레딧이 없습니다. 크레딧 충전 페이지로 이동합니다.");
+      alert(t("alert_no_credits"));
       router.push("/pricing");
       return;
     }
