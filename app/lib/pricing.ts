@@ -73,6 +73,57 @@ export function getPlan(id: string): PricingPlan | undefined {
   return PRICING_PLANS.find((p) => p.id === id);
 }
 
+export interface LocalizedPriceInfo {
+  priceStr: string;
+  perPhotoStr: string;
+  currencySuffix: string;
+  countryCode: string;
+}
+
+export const LOCALIZED_PRICING: Record<string, Record<string, LocalizedPriceInfo>> = {
+  ms: {
+    starter: { priceStr: "RM 18", perPhotoStr: "RM 3.60 / foto (5 foto)", currencySuffix: "MYR", countryCode: "MY" },
+    standard: { priceStr: "RM 32", perPhotoStr: "RM 3.20 / foto (10 foto)", currencySuffix: "MYR", countryCode: "MY" },
+    best_value: { priceStr: "RM 50", perPhotoStr: "RM 2.50 / foto (20 foto)", currencySuffix: "MYR", countryCode: "MY" },
+  },
+  ko: {
+    starter: { priceStr: "₩5,500", perPhotoStr: "장당 ₩1,100 (5장)", currencySuffix: "KRW", countryCode: "KR" },
+    standard: { priceStr: "₩9,800", perPhotoStr: "장당 ₩980 (10장)", currencySuffix: "KRW", countryCode: "KR" },
+    best_value: { priceStr: "₩15,900", perPhotoStr: "장당 ₩795 (20장)", currencySuffix: "KRW", countryCode: "KR" },
+  },
+  en: {
+    starter: { priceStr: "$3.99", perPhotoStr: "$0.80 / photo (5 photos)", currencySuffix: "USD", countryCode: "US" },
+    standard: { priceStr: "$6.99", perPhotoStr: "$0.70 / photo (10 photos)", currencySuffix: "USD", countryCode: "US" },
+    best_value: { priceStr: "$10.99", perPhotoStr: "$0.55 / photo (20 photos)", currencySuffix: "USD", countryCode: "US" },
+  },
+  th: {
+    starter: { priceStr: "฿149", perPhotoStr: "฿29.80 / รูป (5 รูป)", currencySuffix: "THB", countryCode: "TH" },
+    standard: { priceStr: "฿259", perPhotoStr: "฿25.90 / รูป (10 รูป)", currencySuffix: "THB", countryCode: "TH" },
+    best_value: { priceStr: "฿399", perPhotoStr: "฿19.95 / รูป (20 รูป)", currencySuffix: "THB", countryCode: "TH" },
+  },
+  id: {
+    starter: { priceStr: "Rp 65.000", perPhotoStr: "Rp 13.000 / foto (5 foto)", currencySuffix: "IDR", countryCode: "ID" },
+    standard: { priceStr: "Rp 115.000", perPhotoStr: "Rp 11.500 / foto (10 foto)", currencySuffix: "IDR", countryCode: "ID" },
+    best_value: { priceStr: "Rp 179.000", perPhotoStr: "Rp 8.950 / foto (20 foto)", currencySuffix: "IDR", countryCode: "ID" },
+  },
+  vi: {
+    starter: { priceStr: "99.000₫", perPhotoStr: "19.800₫ / ảnh (5 ảnh)", currencySuffix: "VND", countryCode: "VN" },
+    standard: { priceStr: "179.000₫", perPhotoStr: "17.900₫ / ảnh (10 ảnh)", currencySuffix: "VND", countryCode: "VN" },
+    best_value: { priceStr: "279.000₫", perPhotoStr: "13.950₫ / ảnh (20 ảnh)", currencySuffix: "VND", countryCode: "VN" },
+  },
+};
+
+export function getLocalizedPrice(planId: string, lang: string): LocalizedPriceInfo {
+  const langPricing = LOCALIZED_PRICING[lang] || LOCALIZED_PRICING.ms;
+  const defaultInfo = LOCALIZED_PRICING.ms[planId] || {
+    priceStr: "$3.99",
+    perPhotoStr: "$0.80 / photo",
+    currencySuffix: "USD",
+    countryCode: "MY",
+  };
+  return langPricing[planId] || defaultInfo;
+}
+
 // ─── Daily Free Generations Event Configuration ─────────────────
 // Set to false to instantly turn off the daily free event without breaking anything.
 export const ENABLE_DAILY_FREE_EVENT = false;

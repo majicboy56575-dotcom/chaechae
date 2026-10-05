@@ -9,13 +9,13 @@ import LanguageSelector from "./components/LanguageSelector";
 import FeedbackModal from "./components/FeedbackModal";
 import { useTranslation } from "./lib/i18n/LanguageContext";
 import { CATEGORIES, STYLES } from "./lib/styles";
-import { getTotalAvailableCredits, fetchFirestoreCredits, getDailyFreeRemaining, PRICING_PLANS } from "./lib/pricing";
+import { getTotalAvailableCredits, fetchFirestoreCredits, getDailyFreeRemaining, PRICING_PLANS, getLocalizedPrice } from "./lib/pricing";
 import { useAuth } from "./lib/auth/AuthContext";
 import { useInstallApp } from "./lib/useInstallApp";
 
 export default function Home() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [currentCredits, setCurrentCredits] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, loginWithGoogle, logout, loading } = useAuth();
@@ -621,6 +621,18 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto mb-10">
           {PRICING_PLANS.map((plan) => {
             const isPop = plan.isPopular;
+            const loc = getLocalizedPrice(plan.id, language);
+            const planName = t(`plan_${plan.id}_name` as keyof typeof import("./lib/i18n/translations").translations.ko) || plan.name;
+            const planDesc = t(`plan_${plan.id}_desc` as keyof typeof import("./lib/i18n/translations").translations.ko) || plan.description;
+            const planBadge = plan.discountBadge ? (t(`plan_${plan.id}_badge` as keyof typeof import("./lib/i18n/translations").translations.ko) || plan.discountBadge) : null;
+            const features = [
+              t(`plan_${plan.id}_f1` as keyof typeof import("./lib/i18n/translations").translations.ko),
+              t(`plan_${plan.id}_f2` as keyof typeof import("./lib/i18n/translations").translations.ko),
+              t(`plan_${plan.id}_f3` as keyof typeof import("./lib/i18n/translations").translations.ko),
+              t(`plan_${plan.id}_f4` as keyof typeof import("./lib/i18n/translations").translations.ko),
+              t(`plan_${plan.id}_f5` as keyof typeof import("./lib/i18n/translations").translations.ko),
+            ].filter(Boolean);
+
             return (
               <div
                 key={plan.id}
@@ -630,40 +642,40 @@ export default function Home() {
                     : "bg-white border border-slate-200/80 shadow-sm hover:shadow-md"
                 }`}
               >
-                {plan.discountBadge && (
+                {planBadge && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-extrabold tracking-wide uppercase bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/20 whitespace-nowrap">
-                    {plan.discountBadge}
+                    {planBadge}
                   </div>
                 )}
 
                 <div>
                   <div className="flex items-center justify-between mb-4 mt-1">
                     <h3 className="font-extrabold text-lg text-slate-900 font-outfit">
-                      {plan.name}
+                      {planName}
                     </h3>
                     <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-indigo-50 text-indigo-700">
-                      +{plan.count}장
+                      +{plan.count}
                     </span>
                   </div>
 
                   <div className="mb-4">
-                    <div className="flex items-baseline gap-1">
+                    <div className="flex items-baseline gap-1.5">
                       <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight font-outfit">
-                        {plan.priceStr}
+                        {loc.priceStr}
                       </span>
-                      <span className="text-xs text-slate-400 font-medium">/ 1회 결제</span>
+                      <span className="text-xs text-slate-400 font-medium">/ {loc.currencySuffix}</span>
                     </div>
-                    <p className="text-xs font-bold text-emerald-600 mt-1">
-                      장당 {plan.perPhoto}
+                    <p className="text-xs font-bold text-indigo-600 mt-1">
+                      {loc.perPhotoStr}
                     </p>
                   </div>
 
                   <p className="text-xs text-slate-500 leading-relaxed mb-6">
-                    {plan.description}
+                    {planDesc}
                   </p>
 
                   <div className="space-y-2.5 mb-8 pt-4 border-t border-slate-100 text-xs text-slate-600">
-                    {plan.features.map((feat, idx) => (
+                    {features.map((feat, idx) => (
                       <div key={idx} className="flex items-start gap-2">
                         <span className="text-emerald-500 font-bold flex-shrink-0">✓</span>
                         <span>{feat}</span>
@@ -680,12 +692,19 @@ export default function Home() {
                       : "bg-slate-900 hover:bg-slate-800 text-white"
                   }`}
                 >
-                  <span>충전하기</span>
+                  <span>{t("nav_recharge")}</span>
                   <span>→</span>
                 </Link>
               </div>
             );
           })}
+        </div>
+
+        {/* Exchange rate note */}
+        <div className="max-w-xl mx-auto text-center mb-10">
+          <p className="text-xs text-slate-400 font-medium leading-relaxed">
+            ℹ️ {t("pricing_exchange_rate_note" as keyof typeof import("./lib/i18n/translations").translations.ms)}
+          </p>
         </div>
 
         {/* Guarantees on Landing Page */}

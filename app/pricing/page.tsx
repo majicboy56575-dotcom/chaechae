@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { PRICING_PLANS, type PricingPlan, getTotalAvailableCredits, addLocalCredits, fetchFirestoreCredits, addCreditsServer } from "../lib/pricing";
+import { PRICING_PLANS, type PricingPlan, getLocalizedPrice, getTotalAvailableCredits, addLocalCredits, fetchFirestoreCredits, addCreditsServer } from "../lib/pricing";
 import LanguageSelector from "../components/LanguageSelector";
 import { useTranslation } from "../lib/i18n/LanguageContext";
 import { useAuth } from "../lib/auth/AuthContext";
@@ -152,7 +152,9 @@ export default function PricingPage() {
     }
 
     const openCheckout = (instance: Paddle) => {
-      const isKorean = language === "ko" || (typeof Intl !== "undefined" && Intl.DateTimeFormat().resolvedOptions().timeZone.includes("Seoul"));
+      const locPrice = getLocalizedPrice(selectedPlan.id, language);
+      const isKorean = language === "ko";
+      const countryCode = locPrice.countryCode || (isKorean ? "KR" : "MY");
       instance.Checkout.open({
         items: [{ priceId: selectedPlan.paddlePriceId!, quantity: 1 }],
         customData: {
@@ -163,7 +165,7 @@ export default function PricingPage() {
         customer: user.email
           ? {
               email: user.email,
-              address: isKorean ? { countryCode: "KR" } : undefined,
+              address: { countryCode },
             }
           : undefined,
         settings: {
@@ -210,10 +212,6 @@ export default function PricingPage() {
   const getPlanBadge = (plan: PricingPlan) => {
     if (!plan.discountBadge) return null;
     return t(`plan_${plan.id}_badge` as keyof typeof import("../lib/i18n/translations").translations.ko) || plan.discountBadge;
-  };
-
-  const getPlanPer = (plan: PricingPlan) => {
-    return t(`plan_${plan.id}_per` as keyof typeof import("../lib/i18n/translations").translations.ko) || `${plan.perPhoto} / photo (${plan.count} photos)`;
   };
 
   const getPlanFeatures = (plan: PricingPlan) => {
@@ -507,6 +505,7 @@ export default function PricingPage() {
             const isSelected = selectedPlan.id === plan.id;
             const badge = getPlanBadge(plan);
             const features = getPlanFeatures(plan);
+            const loc = getLocalizedPrice(plan.id, language);
 
             return (
               <div
@@ -558,14 +557,14 @@ export default function PricingPage() {
 
                   {/* Price */}
                   <div className="mb-6 bg-slate-50/70 rounded-2xl p-4 border border-slate-100">
-                    <div className="flex items-baseline gap-1">
+                    <div className="flex items-baseline gap-1.5">
                       <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                        {plan.priceStr}
+                        {loc.priceStr}
                       </span>
-                      <span className="text-xs font-bold text-slate-400">/ USD</span>
+                      <span className="text-xs font-bold text-slate-400">/ {loc.currencySuffix}</span>
                     </div>
                     <p className="text-[11px] font-bold text-indigo-600 mt-1">
-                      {getPlanPer(plan)}
+                      {loc.perPhotoStr}
                     </p>
                   </div>
 
@@ -615,7 +614,7 @@ export default function PricingPage() {
             </div>
             <div className="text-right">
               <span className="text-2xl font-black text-slate-900">
-                {selectedPlan.priceStr}
+                {getLocalizedPrice(selectedPlan.id, language).priceStr}
               </span>
               <span className="block text-[11px] font-bold text-emerald-600">
                 +{selectedPlan.count}
@@ -660,10 +659,10 @@ export default function PricingPage() {
                       <span>💳</span>
                       <span>
                         {language === "ko"
-                          ? `신용/체크카드 · PayPal · Apple Pay · Google Pay 결제 (${selectedPlan.priceStr})`
+                          ? `신용/체크카드 · PayPal · Apple Pay · Google Pay 결제 (${getLocalizedPrice(selectedPlan.id, language).priceStr})`
                           : language === "ms"
-                          ? `Bayar dengan Kad / PayPal / Apple Pay / Google Pay (${selectedPlan.priceStr})`
-                          : `Pay with Card / PayPal / Apple Pay / Google Pay (${selectedPlan.priceStr})`}
+                          ? `Bayar dengan Kad / PayPal / Apple Pay / Google Pay (${getLocalizedPrice(selectedPlan.id, language).priceStr})`
+                          : `Pay with Card / PayPal / Apple Pay / Google Pay (${getLocalizedPrice(selectedPlan.id, language).priceStr})`}
                       </span>
                     </>
                   )}
@@ -675,6 +674,12 @@ export default function PricingPage() {
                   <span>⚡ {t("pricing_trust_instant")}</span>
                   <span>•</span>
                   <span>🛡️ 100% {t("modal_success_badge") || "Protected"}</span>
+                </div>
+
+                <div className="mt-3 text-center">
+                  <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
+                    ℹ️ {t("pricing_exchange_rate_note" as keyof typeof import("../lib/i18n/translations").translations.ms)}
+                  </p>
                 </div>
               </div>
             </>
