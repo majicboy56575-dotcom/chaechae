@@ -1,6 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
+import { randomUUID } from "crypto";
 import { buildPrompt, getStyle, type BgColor } from "../../lib/styles";
+import { getUidFromRequest } from "../../lib/verifyUser";
+import {
+  reserveGeneration,
+  refundGeneration,
+  setPendingRegen,
+  consumePendingRegen,
+  getCredits,
+  getTrialAvailable,
+  type GenerationKind,
+} from "../../lib/credits";
+import { applyTrialWatermark } from "../../lib/watermark";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -30,12 +42,25 @@ function toUserMessage(err: unknown, fallback: string): string {
 }
 
 export async function POST(req: NextRequest) {
+  // Tracks a reserved credit/trial so it can be refunded if generation fails
+  let reserved: { uid: string; kind: GenerationKind } | null = null;
+  // Tracks a consumed free-regen token so it can be restored if regeneration fails
+  let regenRestore: { uid: string; id: string; watermark: boolean } | null = null;
   try {
     const body = await req.json();
     const imageBase64: string | undefined = body.imageBase64;
     const styleId: string = body.styleId ?? body.style ?? "corporate";
     const bgColor: BgColor | undefined = body.bgColor;
     const rawCustomPrompt: string | undefined = body.customPrompt;
+    const regenId: string | undefined = typeof body.regenId === "string" ? body.regenId : undefined;
+
+    const uid = await getUidFromRequest(req);
+    if (!uid) {
+      return NextResponse.json(
+        { error: "Login required.", code: "AUTH_REQUIRED" },
+        { status: 401 }
+      );
+    }
 
     if (!imageBase64) {
       return NextResponse.json(
@@ -91,6 +116,32 @@ export async function POST(req: NextRequest) {
       customPrompt: rawCustomPrompt,
     });
 
+    // ─── Decide paid (clean) vs free trial (watermarked) on the server ───
+    let watermark: boolean;
+    let isRegen = false;
+    if (regenId) {
+      const pending = await consumePendingRegen(uid, regenId);
+      if (!pending) {
+        return NextResponse.json(
+          { error: "Free regeneration is no longer available.", code: "REGEN_INVALID" },
+          { status: 403 }
+        );
+      }
+      watermark = pending.watermark;
+      isRegen = true;
+      regenRestore = { uid, id: regenId, watermark };
+    } else {
+      const kind = await reserveGeneration(uid);
+      if (!kind) {
+        return NextResponse.json(
+          { error: "No credits available.", code: "NO_CREDITS", credits: 0, trialAvailable: false },
+          { status: 402 }
+        );
+      }
+      reserved = { uid, kind };
+      watermark = kind === "trial";
+    }
+
     const ai = new GoogleGenAI({ apiKey });
 
     // Single attempt against one model; returns null if no image came back.
@@ -145,12 +196,49 @@ export async function POST(req: NextRequest) {
       throw new Error(`인공지능 모델 생성 실패.\n[Lite]: ${liteResult.error}`);
     }
 
+    if (watermark) {
+      const raw = liteResult.imageUrl.split("base64,")[1] ?? "";
+      liteResult.imageUrl = await applyTrialWatermark(raw);
+    }
+
+    // Generation succeeded — keep the reservation
+    reserved = null;
+    regenRestore = null;
+
+    // Issue a one-time free regeneration token for fresh (non-regen) results
+    let nextRegenId: string | null = null;
+    if (!isRegen) {
+      nextRegenId = randomUUID();
+      await setPendingRegen(uid, nextRegenId, watermark);
+    }
+
+    const [credits, trialAvailable] = await Promise.all([getCredits(uid), getTrialAvailable(uid)]);
+
     return NextResponse.json({
-      lite: liteResult
+      lite: liteResult,
+      watermarked: watermark,
+      regenId: nextRegenId,
+      credits,
+      trialAvailable,
     });
 
   } catch (err: unknown) {
     console.error("Generate API Error:", err);
+
+    if (reserved) {
+      try {
+        await refundGeneration(reserved.uid, reserved.kind);
+      } catch (refundErr) {
+        console.error("[Generate] Refund failed:", refundErr);
+      }
+    }
+    if (regenRestore) {
+      try {
+        await setPendingRegen(regenRestore.uid, regenRestore.id, regenRestore.watermark);
+      } catch (restoreErr) {
+        console.error("[Generate] Regen token restore failed:", restoreErr);
+      }
+    }
 
     const rawErrorMsg = err instanceof Error ? err.message : String(err);
     let clientErrorMessage = "AI 헤드샷 생성 처리 중 서버 오류가 발생했습니다. 다시 시도해 주세요.";

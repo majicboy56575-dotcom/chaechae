@@ -11,7 +11,7 @@ import {
   type CategoryId,
 } from "../lib/styles";
 import { PRINT_SIZES, generatePhotoSheet, type PrintSize } from "../lib/photoSheet";
-import { getTotalAvailableCredits, consumeLocalCredit, consumeCreditServer } from "../lib/pricing";
+import { getTotalAvailableCredits, getLocalCredits, getTrialRemaining, setLocalCredits, setTrialAvailable } from "../lib/pricing";
 import CompareSlider from "./CompareSlider";
 import { useTranslation } from "../lib/i18n/LanguageContext";
 import { useAuth } from "../lib/auth/AuthContext";
@@ -64,16 +64,29 @@ export default function UploadCard() {
   const [credits, setCredits] = useState<number>(0);
   const [hasUsedFreeRegen, setHasUsedFreeRegen] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [isWatermarked, setIsWatermarked] = useState(false);
+  const [regenId, setRegenId] = useState<string | null>(null);
+  // True when the next generation will use the free (watermarked) trial
+  const [willUseTrial, setWillUseTrial] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Sync credits
   useEffect(() => {
-    setCredits(getTotalAvailableCredits());
-    const handleCreditUpdate = () => setCredits(getTotalAvailableCredits());
-    window.addEventListener("chae_chae_credits_updated", handleCreditUpdate);
-    return () => window.removeEventListener("chae_chae_credits_updated", handleCreditUpdate);
+    const sync = () => {
+      setCredits(getTotalAvailableCredits());
+      setWillUseTrial(getLocalCredits() <= 0 && getTrialRemaining() > 0);
+    };
+    sync();
+    window.addEventListener("chae_chae_credits_updated", sync);
+    return () => window.removeEventListener("chae_chae_credits_updated", sync);
   }, []);
+
+  // Apply credit/trial state returned by the server
+  const syncFromServer = (data: { credits?: unknown; trialAvailable?: unknown }) => {
+    if (typeof data.credits === "number") setLocalCredits(data.credits);
+    if (typeof data.trialAvailable === "boolean") setTrialAvailable(data.trialAvailable);
+  };
 
   // Rotate fun loading messages
   useEffect(() => {
@@ -253,10 +266,12 @@ export default function UploadCard() {
     setError(null);
 
     try {
+      const idToken = await user.getIdToken();
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
         },
         body: JSON.stringify({
           imageBase64: selfieBase64,
@@ -268,18 +283,25 @@ export default function UploadCard() {
 
       const data = await response.json();
 
+      if (response.status === 402) {
+        // Out of paid credits and the free trial is already used
+        syncFromServer(data);
+        alert(t("alert_trial_used"));
+        router.push("/pricing");
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(data.error || "Failed to generate AI image.");
       }
 
-      // Deduct 1 credit upon success (server-side Firestore + localStorage sync)
-      if (user?.uid) {
-        await consumeCreditServer(user.uid);
-      } else {
-        consumeLocalCredit();
-      }
+      // Credit / trial were already deducted on the server — just sync UI state
+      syncFromServer(data);
 
       setUsedStyleId(selectedStyleId);
+      setIsWatermarked(data.watermarked === true);
+      setRegenId(typeof data.regenId === "string" ? data.regenId : null);
+      setHasUsedFreeRegen(false);
       setResult({
         lite: data.lite,
       });
@@ -355,19 +377,21 @@ export default function UploadCard() {
 
   // Free 1-Click Regeneration (Satisfaction Guarantee — no credit deduction)
   const handleFreeRegenerate = async () => {
-    if (!selfieBase64 || hasUsedFreeRegen) return;
+    if (!selfieBase64 || hasUsedFreeRegen || !regenId || !user) return;
     setIsRegenerating(true);
     setError(null);
 
     try {
+      const idToken = await user.getIdToken();
       const response = await fetch("/api/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
         body: JSON.stringify({
           imageBase64: selfieBase64,
           styleId: usedStyleId,
           bgColor,
           customPrompt: usedStyleId === "custom" ? customPrompt.trim() : undefined,
+          regenId,
         }),
       });
 
@@ -377,8 +401,11 @@ export default function UploadCard() {
       }
 
       // No credit deduction for free regeneration
+      syncFromServer(data);
+      setIsWatermarked(data.watermarked === true);
       setResult({ lite: data.lite });
       setHasUsedFreeRegen(true);
+      setRegenId(null);
     } catch (err: unknown) {
       console.error(err);
       const msg = err instanceof Error ? err.message : String(err);
@@ -424,6 +451,28 @@ export default function UploadCard() {
           <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t("result_title")}</h3>
           <p className="text-xs text-slate-500 mt-1">{t("result_subtitle")}</p>
         </div>
+
+        {/* Free trial upsell — watermarked preview */}
+        {isWatermarked && bestResult && (
+          <div className="mb-8 relative overflow-hidden rounded-2xl border border-indigo-200 bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 p-5 sm:p-6 text-white shadow-xl shadow-indigo-500/20">
+            <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10 blur-2xl" />
+            <div className="relative flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="flex-1">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-[10px] font-extrabold uppercase tracking-wider mb-2">
+                  🎁 {t("trial_badge")}
+                </span>
+                <h4 className="text-base sm:text-lg font-black leading-snug">{t("trial_result_title")}</h4>
+                <p className="text-xs text-indigo-100 mt-1 leading-relaxed">{t("trial_result_desc")}</p>
+              </div>
+              <button
+                onClick={() => router.push("/pricing")}
+                className="flex-shrink-0 bg-white text-indigo-700 hover:bg-indigo-50 font-extrabold text-sm py-3 px-5 rounded-xl shadow-lg transition-all active:scale-[0.98] animate-pulse hover:animate-none"
+              >
+                {t("trial_result_cta")} →
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-col items-center mb-8">
           <div className="w-full max-w-md bg-slate-50/50 rounded-2xl border border-slate-100 p-5 flex flex-col items-center shadow-sm">
@@ -569,7 +618,7 @@ export default function UploadCard() {
         )}
 
         {/* Satisfaction Guarantee — Free Regeneration */}
-        {bestResult && !hasUsedFreeRegen && (
+        {bestResult && !hasUsedFreeRegen && regenId && (
           <div className="mb-6 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border border-amber-200/80 rounded-2xl p-4 sm:p-5">
             <div className="flex items-start gap-3">
               <span className="text-2xl flex-shrink-0">✨</span>
@@ -844,6 +893,14 @@ export default function UploadCard() {
               );
             })}
           </div>
+        </div>
+      )}
+
+      {/* Free trial hint */}
+      {willUseTrial && (
+        <div className="mb-3 flex items-center justify-center gap-2 text-[11px] font-bold text-indigo-700 bg-indigo-50/80 border border-indigo-100 py-2 px-3 rounded-xl">
+          <span>🎁</span>
+          <span>{t("trial_form_hint")}</span>
         </div>
       )}
 

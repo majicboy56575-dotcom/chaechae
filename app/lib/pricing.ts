@@ -100,7 +100,29 @@ export function getDailyFreeRemaining(): number {
 export function getTotalAvailableCredits(): number {
   const free = getDailyFreeRemaining();
   const purchased = getLocalCredits();
-  return free + purchased;
+  return free + purchased + getTrialRemaining();
+}
+
+// ─── One-time free trial (watermarked) — server is the source of truth ───
+const TRIAL_USED_KEY = "monopic_trial_used";
+
+/** 1 if the one-time watermarked free trial is (believed to be) available, else 0. */
+export function getTrialRemaining(): number {
+  if (typeof window === "undefined") return 0;
+  try {
+    return localStorage.getItem(TRIAL_USED_KEY) === "1" ? 0 : 1;
+  } catch {
+    return 0;
+  }
+}
+
+/** Sync the trial flag from a server response. */
+export function setTrialAvailable(available: boolean): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(TRIAL_USED_KEY, available ? "0" : "1");
+    window.dispatchEvent(new Event("chae_chae_credits_updated"));
+  } catch {}
 }
 
 // Local storage credit helper for seamless UX
@@ -198,6 +220,9 @@ export async function fetchFirestoreCredits(userId: string): Promise<number> {
     if (!res.ok) return localCredits;
     const data = await res.json();
     const serverCredits = typeof data.credits === "number" ? data.credits : 0;
+    if (typeof data.trialAvailable === "boolean") {
+      setTrialAvailable(data.trialAvailable);
+    }
 
     // If local has more credits than server (e.g. from recent purchase or legacy), sync to server!
     if (localCredits > serverCredits) {
